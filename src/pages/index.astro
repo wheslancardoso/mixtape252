@@ -9,98 +9,124 @@ const posts = await sanityClient.fetch(`*[_type == "post"] | order(publishedAt d
   mainImage, 
   excerpt
 }`);
-
-// Função para gerar rotações nos cards (simulando colagem manual)
-function getRotation(index: number) {
-  const rotations = ['rotate-1', '-rotate-2', 'rotate-2', '-rotate-1'];
-  return rotations[index % rotations.length];
-}
 ---
 
-<BaseLayout title="MIXTAPE252 // ARTE & CAOS">
-  
-  <section class="relative flex flex-col items-center justify-center min-h-screen p-6 text-center bg-[#f4f1ea] border-b-4 border-black overflow-hidden">
+<BaseLayout title="MIXTAPE252 // MANIFESTO">
     
-    <div class="relative z-10 mb-8 rotate-[-1deg]">
-      <h1 class="text-6xl md:text-9xl font-black tracking-tighter uppercase leading-[0.85] text-black drop-shadow-[6px_6px_0px_rgba(0,0,0,0.15)]">
-        ARTE COM VERDADE<br/>
-        <span class="text-[#ff4d00] bg-black px-2 inline-block transform -skew-x-6">E CAOS CONTROLADO</span>
-      </h1>
+    <div class="bg-ink text-paper py-2 border-b-4 border-ink overflow-hidden marquee-container">
+        <div class="marquee-content font-headline text-lg tracking-widest uppercase">
+            // BEM-VINDO AO CAOS // ARTE SEM PERMISSÃO // MIXTAPE252 // 2025 // BEM-VINDO AO CAOS // ARTE SEM PERMISSÃO // MIXTAPE252 // 2025 // BEM-VINDO AO CAOS // ARTE SEM PERMISSÃO // MIXTAPE252 // 2025
+        </div>
     </div>
 
-    <div class="relative z-10 bg-white border-4 border-black p-8 max-w-2xl text-left shadow-[12px_12px_0px_0px_#111] transform rotate-1 hover:rotate-0 transition-transform duration-300">
-      <ul class="list-none space-y-4 font-mono text-lg md:text-xl font-bold text-black">
-        <li class="flex items-center gap-4">
-          <span class="bg-black text-white px-3 py-1 text-sm border-2 border-transparent">01</span> 
-          CRIAMOS COMO COLETIVO.
-        </li>
-        <li class="flex items-center gap-4">
-          <span class="bg-black text-white px-3 py-1 text-sm border-2 border-transparent">02</span> 
-          AGIMOS COMO AGÊNCIA.
-        </li>
-        <li class="flex items-center gap-4">
-          <span class="bg-black text-white px-3 py-1 text-sm border-2 border-transparent">03</span> 
-          PENSAMOS COMO BANDA PUNK.
-        </li>
-      </ul>
-      <div class="mt-8 pt-4 border-t-4 border-black flex flex-col md:flex-row md:items-center justify-between text-xs md:text-sm font-sans uppercase tracking-widest text-gray-600 gap-2">
-        <span>Sem métrica.</span>
-        <span>Sem algoritmo.</span>
-      </div>
-    </div>
+    <header class="w-full max-w-7xl mx-auto p-4 md:p-8 flex flex-col md:flex-row justify-between items-center border-b-4 border-ink mb-8 md:mb-16 bg-white relative z-10 transform -rotate-1 shadow-hard-sm">
+        <h1 class="text-5xl md:text-7xl font-headline tracking-tighter uppercase mb-4 md:mb-0 hover:text-safety-orange transition-colors cursor-pointer">
+            Mixtape252
+        </h1>
+        <nav>
+            <ul class="flex space-x-6 md:space-x-12 font-bold text-lg md:text-xl tracking-tight font-headline">
+                <li><a href="#" class="hover:bg-ink hover:text-safety-orange px-2 py-1 transition-all">MANIFESTO</a></li>
+                <li><a href="#drops" class="hover:bg-ink hover:text-safety-orange px-2 py-1 transition-all">ZINE</a></li>
+                <li><a href="#" class="hover:bg-ink hover:text-safety-orange px-2 py-1 transition-all">CONTATO</a></li>
+            </ul>
+        </nav>
+    </header>
 
-    <a href="#zine" class="relative z-10 mt-16 px-12 py-5 bg-[#ff4d00] text-white border-4 border-black font-black text-2xl uppercase tracking-wide hover:bg-black hover:text-white hover:-translate-y-2 hover:shadow-[8px_8px_0px_0px_#000] transition-all duration-200 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-      Acessar Zine ↓
-    </a>
+    <main class="flex-grow w-full max-w-6xl mx-auto px-4 relative z-10">
+        <section class="mb-24 flex flex-col md:flex-row gap-12 items-start">
+            <div class="w-full md:w-2/3">
+                <h2 class="text-6xl md:text-8xl lg:text-9xl font-headline leading-[0.85] uppercase mb-8 drop-shadow-md">
+                    Arte com <span class="text-safety-orange bg-ink px-2">Verdade</span> <br>& Caos Controlado
+                </h2>
+                
+                <div class="border-l-8 border-safety-orange pl-6 py-2 mb-8 bg-white border-4 border-ink p-6 shadow-hard rotate-1">
+                    <ul class="font-headline text-2xl md:text-3xl space-y-2 uppercase tracking-wide">
+                        <li class="flex items-center gap-2">01. CRIAMOS COMO COLETIVO.</li>
+                        <li class="flex items-center gap-2">02. AGIMOS COMO AGÊNCIA.</li>
+                        <li class="flex items-center gap-2">03. PENSAMOS COMO BANDA PUNK.</li>
+                    </ul>
+                </div>
 
-  </section>
+                <p class="text-xl md:text-2xl mb-10 max-w-xl font-bold border-b-2 border-ink inline-block pb-1">
+                    Sem pressão de métrica. Sem algoritmo no pescoço. Apenas o que importa.
+                </p>
 
-  <section id="zine" class="py-24 px-4 bg-white min-h-screen relative">
-    <div class="container mx-auto max-w-7xl">
-      
-      <div class="mb-20 flex items-center justify-center md:justify-start">
-        <h2 class="text-5xl md:text-8xl font-black uppercase tracking-tighter bg-black text-white px-4 py-2 transform -rotate-2 shadow-[8px_8px_0px_0px_#ff4d00]">
-          Latest Drops
-        </h2>
-      </div>
+                <a href="#drops" class="inline-block btn-press bg-safety-orange text-ink border-4 border-ink px-8 py-4 text-3xl font-headline uppercase tracking-wider shadow-hard hover:bg-ink hover:text-white transition-all transform hover:-rotate-1">
+                    ACESSAR ZINE
+                </a>
+            </div>
+            
+            <div class="hidden md:block w-1/3 pt-12">
+                 <div class="bg-ink p-2 transform rotate-3 shadow-hard-lg">
+                    <div class="bg-paper border-2 border-ink p-4 flex flex-col items-center justify-center h-64">
+                         <span class="text-8xl mb-4 font-headline">!</span>
+                         <span class="font-headline text-xl text-center">ESTE ESPAÇO NÃO ESTÁ À VENDA</span>
+                    </div>
+                 </div>
+            </div>
+        </section>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 md:gap-16 px-4">
-        {posts.map((post: any, index: number) => (
-          <a 
-            href={`/post/${post.slug.current}`} 
-            class={`group block relative bg-[#f4f1ea] border-4 border-black h-full hover:z-20 hover:scale-105 transition-all duration-300 shadow-[8px_8px_0px_0px_#000] hover:shadow-[16px_16px_0px_0px_#ff4d00] ${getRotation(index)}`}
-          >
-            <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-6 bg-white/50 backdrop-blur-sm border border-gray-300 rotate-1 shadow-sm z-10"></div>
-
-            <div class="aspect-square border-b-4 border-black overflow-hidden relative">
-              {post.mainImage ? (
-                <img 
-                  src={urlFor(post.mainImage).width(600).height(600).url()} 
-                  alt={post.title}
-                  class="w-full h-full object-cover grayscale contrast-125 group-hover:grayscale-0 transition-all duration-500 scale-100 group-hover:scale-110"
-                />
-              ) : (
-                <div class="w-full h-full flex items-center justify-center bg-neutral-200 font-mono">NO SIGNAL</div>
-              )}
-              
-              <div class="absolute bottom-0 right-0 bg-black text-white text-xs font-mono px-3 py-1 border-t-4 border-l-4 border-black">
-                {new Date(post.publishedAt).toLocaleDateString('pt-BR')}
-              </div>
+        <section id="drops" class="mb-24">
+            <div class="flex items-center gap-4 mb-12">
+                 <h3 class="text-4xl md:text-6xl font-headline uppercase bg-white border-4 border-ink px-4 py-2 inline-block shadow-hard transform -rotate-2">
+                    Latest Drops
+                </h3>
+                <span class="h-4 flex-grow bg-ink repeating-linear-gradient"></span>
             </div>
 
-            <div class="p-6 flex flex-col gap-4">
-              <h3 class="text-3xl font-black uppercase leading-[0.9] group-hover:text-[#ff4d00] transition-colors">
-                {post.title}
-              </h3>
-              <p class="font-mono text-xs md:text-sm text-gray-800 leading-tight line-clamp-3 border-l-2 border-black pl-3">
-                {post.excerpt}
-              </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
+                {posts.map((post: any) => (
+                  <a href={`/post/${post.slug.current}`} class="group relative bg-white border-4 border-ink p-4 shadow-hard hover:shadow-hard-lg transition-all duration-300 transform hover:-translate-y-2">
+                    
+                    <div class="overflow-hidden border-2 border-ink mb-4 relative aspect-square">
+                        {post.mainImage ? (
+                          <img 
+                            src={urlFor(post.mainImage).width(600).height(600).url()} 
+                            alt={post.title}
+                            class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 scale-100 group-hover:scale-110"
+                          />
+                        ) : (
+                          <div class="w-full h-full flex items-center justify-center bg-gray-200 font-headline text-xl">NO SIGNAL</div>
+                        )}
+                        <div class="absolute top-0 left-0 bg-safety-orange text-white text-xs font-bold px-2 py-1 border-r-2 border-b-2 border-ink font-body">
+                          {new Date(post.publishedAt).toLocaleDateString('pt-BR')}
+                        </div>
+                    </div>
+
+                    <h4 class="text-2xl font-headline uppercase leading-none mb-2 group-hover:text-safety-orange transition-colors">
+                        {post.title}
+                    </h4>
+                    
+                    <p class="text-sm font-bold border-t-2 border-ink pt-2 mt-2 flex justify-between font-body">
+                        <span>#POST</span>
+                        <span>LER MAIS -></span>
+                    </p>
+                  </a>
+                ))}
             </div>
-          </a>
-        ))}
-      </div>
+        </section>
+    </main>
 
+    <footer class="bg-ink text-paper border-t-4 border-safety-orange py-12 relative z-10 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-8">
+            <div class="text-center md:text-left">
+                <h2 class="text-5xl md:text-8xl font-headline tracking-tighter leading-none mb-2">
+                    FEITO NO CAOS
+                </h2>
+                <p class="font-body text-safety-orange text-xl">// EST. 2025</p>
+            </div>
+            
+            <div class="flex flex-col gap-4 text-center md:text-right">
+                <a href="#" class="text-2xl font-headline hover:text-safety-orange hover:underline decoration-4 underline-offset-4 decoration-safety-orange transition-all">INSTAGRAM</a>
+                <a href="#" class="text-2xl font-headline hover:text-safety-orange hover:underline decoration-4 underline-offset-4 decoration-safety-orange transition-all">EMAIL</a>
+            </div>
+        </div>
+        <div class="text-center mt-12 text-xs opacity-50 font-body">
+            NENHUM DIREITO RESERVADO. COPIE, ROUBE, REMIXE.
+        </div>
+    </footer>
+    
+    <div class="hidden lg:block absolute top-1/3 right-10 bg-safety-orange text-white p-4 font-headline text-2xl rotate-12 border-4 border-ink shadow-hard z-20 pointer-events-none mix-blend-multiply">
+        NEW<br>DROP
     </div>
-  </section>
-
 </BaseLayout>

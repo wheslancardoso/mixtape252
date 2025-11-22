@@ -6,23 +6,24 @@ interface Props {
   description?: string;
 }
 
-const { title = "Mixtape252", description = "Digital Zine & Creative Collective" } = Astro.props;
+const { title = "MIXTAPE252", description = "Digital Zine & Creative Collective" } = Astro.props;
 ---
 
 <!doctype html>
 <html lang="pt-br">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@400;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet">
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
     <title>{title}</title>
   </head>
-  <body class="antialiased selection:bg-black selection:text-white">
-    <main class="min-h-screen w-full flex flex-col relative z-10">
-      <slot />
-    </main>
+  <body class="bg-paper text-ink font-body overflow-x-hidden relative min-h-screen flex flex-col selection:bg-safety-orange selection:text-white cursor-crosshair">
+    <div class="noise-overlay"></div>
+    <slot />
   </body>
 </html>
-
