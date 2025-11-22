@@ -1,16 +1,55 @@
 ---
-
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { ArrowRight } from 'lucide-react';
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout title="MIXTAPE252 | Digital Chaos">
+  <section class="relative flex flex-col items-center justify-center min-h-[80vh] px-4 py-20 overflow-hidden">
+    <!-- Decorative Noise/Texture Overlay if needed (CSS handled globally but structural hooks here) -->
+    
+    <div class="w-full max-w-5xl mx-auto relative z-10 space-y-12">
+      
+      <!-- Giant Title -->
+      <div class="relative inline-block transform -rotate-2 hover:rotate-0 transition-transform duration-300">
+        <h1 class="text-6xl md:text-9xl font-black bg-black text-white px-6 py-4 inline-block shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+          MIXTAPE252
+        </h1>
+      </div>
+
+      <!-- Manifesto Section -->
+      <div class="grid md:grid-cols-2 gap-8 items-start mt-12">
+        <div class="text-xl max-w-3xl font-mono border-l-8 border-black pl-6 text-left space-y-4">
+          <p class="font-bold uppercase leading-tight">
+            Criamos como coletivo. <br>
+            Agimos como agência. <br>
+            Pensamos como banda punk.
+          </p>
+          <p class="text-base opacity-80 normal-case font-sans">
+            Sem pressão de métrica. Sem algoritmo no pescoço. <br>
+            Apenas arte com verdade e caos controlado.
+          </p>
+        </div>
+
+        <!-- Call to Action -->
+        <div class="flex flex-col items-start justify-center h-full">
+          <a 
+            href="/zine" 
+            class="group relative inline-flex items-center gap-2 px-8 py-4 bg-[#ff4d00] text-white text-xl font-bold uppercase border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[6px] hover:translate-y-[6px] transition-all duration-200"
+          >
+            <span>Acessar Zine</span>
+            <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+          </a>
+          <span class="mt-4 font-mono text-xs uppercase tracking-widest opacity-60">
+            // v.2.5.2 // early access
+          </span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Abstract Background Elements (Zine Style) -->
+    <div class="absolute top-10 right-10 w-32 h-32 bg-black opacity-10 rotate-12 pointer-events-none"></div>
+    <div class="absolute bottom-20 left-10 w-64 h-12 bg-black opacity-10 -rotate-6 pointer-events-none"></div>
+
+  </section>
+</BaseLayout>
