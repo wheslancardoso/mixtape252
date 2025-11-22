@@ -1,6 +1,9 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { ArrowRight } from 'lucide-react';
+import { sanityClient, urlFor } from '../lib/sanity';
+
+const posts = await sanityClient.fetch('*[_type == "post"] | order(publishedAt desc){title, slug, publishedAt, mainImage, excerpt}');
 ---
 
 <BaseLayout title="MIXTAPE252 | Digital Chaos">
@@ -33,7 +36,7 @@ import { ArrowRight } from 'lucide-react';
         <!-- Call to Action -->
         <div class="flex flex-col items-start justify-center h-full">
           <a 
-            href="/zine" 
+            href="#zine" 
             class="group relative inline-flex items-center gap-2 px-8 py-4 bg-[#ff4d00] text-white text-xl font-bold uppercase border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[6px] hover:translate-y-[6px] transition-all duration-200"
           >
             <span>Acessar Zine</span>
@@ -51,5 +54,60 @@ import { ArrowRight } from 'lucide-react';
     <div class="absolute top-10 right-10 w-32 h-32 bg-black opacity-10 rotate-12 pointer-events-none"></div>
     <div class="absolute bottom-20 left-10 w-64 h-12 bg-black opacity-10 -rotate-6 pointer-events-none"></div>
 
+  </section>
+
+  <!-- Zine Section / Latest Drops -->
+  <section id="zine" class="py-20 px-4 bg-white text-black border-t-4 border-black">
+    <div class="max-w-6xl mx-auto">
+      <h2 class="text-4xl md:text-6xl font-black uppercase mb-12 inline-block border-b-8 border-black pb-2">
+        Latest Drops
+      </h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {posts.map((post: any) => (
+          <a href={`/post/${post.slug.current}`} class="group block h-full">
+            <article class="border-4 border-black h-full bg-[#f4f1ea] transition-transform hover:-translate-y-2 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+              <!-- Image -->
+              <div class="aspect-video w-full overflow-hidden border-b-4 border-black bg-gray-200 relative">
+                {post.mainImage ? (
+                  <img 
+                    src={urlFor(post.mainImage).width(600).url()} 
+                    alt={post.title}
+                    class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+                  />
+                ) : (
+                  <div class="w-full h-full flex items-center justify-center bg-neutral-300 text-neutral-500 font-mono text-sm">NO SIGNAL</div>
+                )}
+                
+                <!-- Overlay Date -->
+                <div class="absolute top-0 left-0 bg-black text-white px-3 py-1 font-mono text-sm">
+                  {new Date(post.publishedAt).toLocaleDateString('pt-BR')}
+                </div>
+              </div>
+
+              <!-- Content -->
+              <div class="p-6 space-y-4">
+                <h3 class="text-2xl font-black leading-none uppercase group-hover:text-[#ff4d00] transition-colors">
+                  {post.title}
+                </h3>
+                <p class="font-mono text-sm leading-relaxed line-clamp-3 opacity-80">
+                  {post.excerpt}
+                </p>
+                <div class="pt-4 flex justify-end">
+                  <span class="inline-block px-3 py-1 bg-black text-white font-mono text-xs uppercase hover:bg-[#ff4d00] transition-colors">Read More_</span>
+                </div>
+              </div>
+            </article>
+          </a>
+        ))}
+      </div>
+      
+      {posts.length === 0 && (
+        <div class="text-center py-20 border-4 border-dashed border-black opacity-50">
+          <p class="font-mono text-xl">SYSTEM EMPTY // AGUARDANDO TRANSMISSÃO</p>
+        </div>
+      )}
+
+    </div>
   </section>
 </BaseLayout>
