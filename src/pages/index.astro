@@ -19,8 +19,8 @@ const posts = await sanityClient.fetch(`*[_type == "post"] | order(publishedAt d
         </div>
     </div>
 
-    <header class="w-full max-w-7xl mx-auto p-4 md:p-8 flex flex-col md:flex-row justify-between items-center border-b-4 border-ink mb-8 md:mb-16 bg-white relative z-10 transform -rotate-1 shadow-hard-sm">
-        <h1 class="text-5xl md:text-7xl font-headline tracking-tighter uppercase mb-4 md:mb-0 hover:text-safety-orange transition-colors cursor-pointer">
+    <header class="w-full max-w-7xl mx-auto p-4 flex flex-col md:flex-row justify-between items-center border-b-4 border-ink mb-8 md:mb-16 bg-white relative z-10 transform -rotate-1 shadow-hard-sm">
+        <h1 class="text-4xl md:text-6xl font-headline tracking-tighter uppercase mb-4 md:mb-0 hover:text-safety-orange transition-colors cursor-pointer">
             Mixtape252
         </h1>
         <nav>
@@ -33,25 +33,25 @@ const posts = await sanityClient.fetch(`*[_type == "post"] | order(publishedAt d
     </header>
 
     <main class="flex-grow w-full max-w-6xl mx-auto px-4 relative z-10">
-        <section class="mb-24 flex flex-col md:flex-row gap-12 items-start">
+        <section class="mb-16 flex flex-col md:flex-row gap-8 items-start">
             <div class="w-full md:w-2/3">
-                <h2 class="text-6xl md:text-8xl lg:text-9xl font-headline leading-[0.85] uppercase mb-8 drop-shadow-md">
+                <h2 class="text-5xl md:text-7xl lg:text-8xl font-headline leading-[0.95] uppercase mb-8 drop-shadow-md">
                     Arte com <span class="text-safety-orange bg-ink px-2">Verdade</span> <br>& Caos Controlado
                 </h2>
                 
                 <div class="border-l-8 border-safety-orange pl-6 py-2 mb-8 bg-white border-4 border-ink p-6 shadow-hard rotate-1">
-                    <ul class="font-headline text-2xl md:text-3xl space-y-2 uppercase tracking-wide">
+                    <ul class="font-headline text-xl md:text-2xl space-y-2 uppercase tracking-wide">
                         <li class="flex items-center gap-2">01. CRIAMOS COMO COLETIVO.</li>
                         <li class="flex items-center gap-2">02. AGIMOS COMO AGÊNCIA.</li>
                         <li class="flex items-center gap-2">03. PENSAMOS COMO BANDA PUNK.</li>
                     </ul>
                 </div>
 
-                <p class="text-xl md:text-2xl mb-10 max-w-xl font-bold border-b-2 border-ink inline-block pb-1">
+                <p class="text-lg md:text-xl mb-10 max-w-xl font-bold border-b-2 border-ink inline-block pb-1">
                     Sem pressão de métrica. Sem algoritmo no pescoço. Apenas o que importa.
                 </p>
 
-                <a href="#drops" class="inline-block btn-press bg-safety-orange text-ink border-4 border-ink px-8 py-4 text-3xl font-headline uppercase tracking-wider shadow-hard hover:bg-ink hover:text-white transition-all transform hover:-rotate-1">
+                <a href="#drops" class="inline-block btn-press bg-safety-orange text-ink border-4 border-ink px-6 py-3 text-xl font-headline uppercase tracking-wider shadow-hard hover:bg-ink hover:text-white transition-all transform hover:-rotate-1">
                     ACESSAR ZINE
                 </a>
             </div>
@@ -66,7 +66,7 @@ const posts = await sanityClient.fetch(`*[_type == "post"] | order(publishedAt d
             </div>
         </section>
 
-        <section id="drops" class="mb-24">
+        <section id="drops" class="mb-16">
             <div class="flex items-center gap-4 mb-12">
                  <h3 class="text-4xl md:text-6xl font-headline uppercase bg-white border-4 border-ink px-4 py-2 inline-block shadow-hard transform -rotate-2">
                     Latest Drops
@@ -74,7 +74,7 @@ const posts = await sanityClient.fetch(`*[_type == "post"] | order(publishedAt d
                 <span class="h-4 flex-grow bg-ink repeating-linear-gradient"></span>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {posts.map((post: any) => (
                   <a href={`/post/${post.slug.current}`} class="group relative bg-white border-4 border-ink p-4 shadow-hard hover:shadow-hard-lg transition-all duration-300 transform hover:-translate-y-2">
                     
