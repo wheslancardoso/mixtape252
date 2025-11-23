@@ -1,0 +1,112 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { sanityClient, urlFor } from '../lib/sanity';
+
+const posts = await sanityClient.fetch(
+  `*[_type == "post"] | order(publishedAt desc){title, slug, publishedAt, mainImage}`
+);
+---
+
+<BaseLayout title="BACKSTAGE // ASSETS // MIXTAPE252">
+  
+  <main class="min-h-screen bg-ink text-paper py-12">
+    
+    <!-- Header Terminal Style -->
+    <div class="container mx-auto px-4 max-w-7xl">
+      <div class="border-4 border-paper p-6 mb-8 bg-black/50">
+        <div class="flex items-center gap-4 mb-4">
+          <span class="font-mono text-safety-orange text-sm">$</span>
+          <h1 class="text-4xl md:text-6xl font-headline uppercase text-paper">
+            BACKSTAGE
+          </h1>
+        </div>
+        <p class="font-mono text-sm text-paper/70 uppercase tracking-widest">
+          // GERADOR DE ARTES // INSTAGRAM // OG IMAGES
+        </p>
+      </div>
+
+      <!-- Grid de Posts -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {posts.map((post: any) => (
+          <article class="border-4 border-paper bg-black/30 p-4 hover:bg-black/50 transition-colors">
+            
+            <!-- Miniatura -->
+            <div class="aspect-square w-full mb-4 border-2 border-paper overflow-hidden bg-gray-900">
+              {post.mainImage ? (
+                <img 
+                  src={urlFor(post.mainImage).width(300).height(300).url()} 
+                  alt={post.title}
+                  class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all"
+                />
+              ) : (
+                <div class="w-full h-full flex items-center justify-center font-mono text-xs text-paper/50">
+                  NO IMAGE
+                </div>
+              )}
+            </div>
+
+            <!-- Info -->
+            <div class="mb-4 space-y-2">
+              <h3 class="font-headline text-xl uppercase text-paper leading-tight line-clamp-2">
+                {post.title}
+              </h3>
+              <p class="font-mono text-xs text-paper/60">
+                {new Date(post.publishedAt).toLocaleDateString('pt-BR')}
+              </p>
+              <p class="font-mono text-xs text-paper/40 uppercase">
+                SLUG: {post.slug.current}
+              </p>
+            </div>
+
+            <!-- Ações -->
+            <div class="flex flex-col gap-2">
+              <a 
+                href={`/api/og?slug=${post.slug.current}`}
+                target="_blank"
+                class="inline-flex items-center justify-center gap-2 bg-safety-orange text-ink px-4 py-3 font-headline uppercase text-sm border-2 border-paper hover:bg-paper hover:text-safety-orange transition-all shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+              >
+                <span>GERAR CARD [PNG]</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                  <polyline points="15 3 21 3 21 9"></polyline>
+                  <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+              </a>
+              
+              <a 
+                href={`/post/${post.slug.current}`}
+                class="inline-flex items-center justify-center gap-2 bg-transparent text-paper px-4 py-2 font-mono text-xs uppercase border border-paper hover:bg-paper hover:text-ink transition-all"
+              >
+                VER POST →
+              </a>
+            </div>
+
+          </article>
+        ))}
+      </div>
+
+      {posts.length === 0 && (
+        <div class="border-4 border-dashed border-paper/50 p-12 text-center">
+          <p class="font-mono text-paper/50 uppercase">
+            // NO POSTS FOUND // SYSTEM EMPTY
+          </p>
+        </div>
+      )}
+
+      <!-- Footer Info -->
+      <div class="mt-12 border-t-4 border-paper pt-8">
+        <div class="font-mono text-xs text-paper/60 space-y-2">
+          <p class="uppercase">// INSTRUÇÕES</p>
+          <ul class="list-disc pl-6 space-y-1">
+            <li>Clique em "GERAR CARD [PNG]" para abrir a imagem OG em nova aba</li>
+            <li>Use Ctrl+S (ou Cmd+S) para salvar a imagem</li>
+            <li>As imagens são geradas dinamicamente e cacheadas por 1 ano</li>
+            <li>Formato: 1080x1080px PNG</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</BaseLayout>
+
