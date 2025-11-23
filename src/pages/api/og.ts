@@ -1,7 +1,7 @@
+import type { APIRoute } from 'astro';
 import satori from 'satori';
 import { Resvg } from '@resvg/resvg-js';
 import { sanityClient, urlFor } from '../../lib/sanity';
-import type { APIRoute } from 'astro';
 
 export const prerender = false;
 
@@ -57,7 +57,8 @@ export const GET: APIRoute = async ({ url }) => {
                   width: '100%',
                   height: '100%',
                   objectFit: 'cover',
-                  filter: 'grayscale(100%) contrast(120%) brightness(0.7)', // Mais escuro para leitura
+                  // ALTERAÇÃO 1: Removido grayscale, mantido contraste para "pop" visual
+                  filter: 'contrast(115%) brightness(1.1)', 
                 },
               },
             },
@@ -85,9 +86,10 @@ export const GET: APIRoute = async ({ url }) => {
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'space-between',
-                  padding: '60px', // Margem de segurança
-                  border: '20px solid white', // Borda agora é parte do layout
-                  margin: '40px', // Afasta a borda do limite da imagem
+                  padding: '60px', // Mantido padding para segurança do texto
+                  // ALTERAÇÃO 2: Removida a borda branca
+                  // border: '20px solid white', 
+                  margin: '0px', // Removida margem para ser full bleed
                 },
                 children: [
                   // Topo
@@ -113,7 +115,7 @@ export const GET: APIRoute = async ({ url }) => {
                       children: title,
                       style: {
                         color: 'white',
-                        fontSize: '100px', // Tamanho seguro
+                        fontSize: '100px', 
                         fontFamily: 'Anton',
                         lineHeight: '0.9',
                         textTransform: 'uppercase',
@@ -126,7 +128,7 @@ export const GET: APIRoute = async ({ url }) => {
             },
           ].filter(Boolean),
         },
-      },
+      } as any,
       {
         width: 1080,
         height: 1080,
@@ -134,10 +136,10 @@ export const GET: APIRoute = async ({ url }) => {
       }
     );
 
-    const resvg = new Resvg(svg);
+    const resvg = new Resvg(svg, { fitTo: { mode: 'width', value: 1080 } });
     const pngBuffer = resvg.render().asPng();
 
-    return new Response(pngBuffer, {
+    return new Response(pngBuffer as any, {
       headers: {
         'Content-Type': 'image/png',
         'Cache-Control': 'public, max-age=31536000, immutable',
