@@ -59,11 +59,11 @@ const siteUrl =
   <body
     class="bg-paper text-ink font-body overflow-x-hidden relative min-h-screen flex flex-col selection:bg-safety-orange selection:text-white cursor-crosshair pt-20"
   >
-    <div class="noise-overlay"></div>
+    <div class="noise-overlay fixed inset-0 z-[60] pointer-events-none"></div>
 
     <!-- Global Navigation -->
     <header
-      class="fixed top-0 left-0 w-full bg-ink text-paper border-b-4 border-safety-orange z-50 h-20 flex items-center shadow-hard"
+      class="fixed top-0 left-0 w-full bg-ink/90 backdrop-blur-md text-paper border-b-4 border-safety-orange z-50 h-20 flex items-center shadow-hard"
     >
       <div
         class="w-full max-w-7xl mx-auto px-4 flex justify-between items-center"
@@ -81,6 +81,13 @@ const siteUrl =
           <ul class="flex gap-6 md:gap-8">
             <li>
               <a
+                href="/edicoes"
+                class="font-mono text-sm md:text-base font-bold hover:text-safety-orange transition-colors uppercase"
+                >Drops</a
+              >
+            </li>
+            <li>
+              <a
                 href="/posts"
                 class="font-mono text-sm md:text-base font-bold hover:text-safety-orange transition-colors uppercase"
                 >Feed</a
@@ -88,16 +95,9 @@ const siteUrl =
             </li>
             <li>
               <a
-                href="/edicoes"
-                class="font-mono text-sm md:text-base font-bold hover:text-safety-orange transition-colors uppercase"
-                >Zines</a
-              >
-            </li>
-            <li>
-              <a
                 href="/sobre"
                 class="font-mono text-sm md:text-base font-bold hover:text-safety-orange transition-colors uppercase"
-                >Sobre</a
+                >Manifesto</a
               >
             </li>
           </ul>
