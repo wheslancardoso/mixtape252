@@ -155,7 +155,7 @@ function getCollageClasses(index: number) {
                 if (index === 0) {
                   return (
                     <a
-                      href={`/post/${post.slug.current}`}
+                      href={`/post/${post.slug.current}?source=${drop.slug.current}`}
                       class={`group col-span-12 md:col-span-8 block relative bg-white border-4 border-ink h-full hover:z-30 hover:scale-[1.02] hover:-rotate-1 transition-all duration-300 shadow-hard hover:shadow-hard-lg overflow-hidden ${getCollageClasses(index)}`}
                     >
                       {post.mainImage ? (
@@ -199,7 +199,7 @@ function getCollageClasses(index: number) {
                 if (index === 1) {
                   return (
                     <a
-                      href={`/post/${post.slug.current}`}
+                      href={`/post/${post.slug.current}?source=${drop.slug.current}`}
                       class={`group col-span-12 md:col-span-4 block relative bg-white border-4 border-ink h-full hover:z-30 hover:scale-[1.02] hover:-rotate-1 transition-all duration-300 shadow-hard hover:shadow-hard-lg md:rotate-2 ${getCollageClasses(index)}`}
                     >
                       {post.mainImage ? (
@@ -242,7 +242,7 @@ function getCollageClasses(index: number) {
                 if (index === 2) {
                   return (
                     <a
-                      href={`/post/${post.slug.current}`}
+                      href={`/post/${post.slug.current}?source=${drop.slug.current}`}
                       class={`group col-span-12 md:col-span-6 block relative bg-ink text-safety-orange border-4 border-ink h-full hover:z-30 hover:scale-[1.02] hover:-rotate-1 transition-all duration-300 shadow-hard hover:shadow-hard-lg hover:bg-safety-orange hover:text-ink p-8 md:p-12 flex flex-col justify-center min-h-[300px] overflow-hidden ${getCollageClasses(index)}`}
                     >
                       <div class="font-mono text-xs uppercase mb-4 opacity-80">
@@ -268,7 +268,7 @@ function getCollageClasses(index: number) {
                 // Post 3+: Cards Normais (col-span-12 md:col-span-6)
                 return (
                   <a
-                    href={`/post/${post.slug.current}`}
+                    href={`/post/${post.slug.current}?source=${drop.slug.current}`}
                     class={`group col-span-12 md:col-span-6 block relative bg-white border-4 border-ink h-full hover:z-30 hover:scale-[1.02] hover:-rotate-1 transition-all duration-300 shadow-hard hover:shadow-hard-lg hover:bg-safety-orange hover:text-white overflow-hidden ${getCollageClasses(index)}`}
                   >
                     {post.mainImage ? (
