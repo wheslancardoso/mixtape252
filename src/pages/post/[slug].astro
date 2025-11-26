@@ -52,7 +52,7 @@ const { post } = Astro.props;
 
     <div class="container mx-auto px-4 max-w-3xl pb-20">
       <div
-        class="prose prose-xl prose-neutral font-serif marker:text-black prose-headings:font-sans prose-headings:uppercase prose-headings:font-black prose-img:border-2 prose-img:border-black"
+        class="prose prose-lg md:prose-2xl max-w-none font-mono text-black leading-relaxed marker:text-black prose-headings:font-headline prose-headings:uppercase prose-headings:font-black prose-p:text-black prose-p:text-justify prose-img:border-4 prose-img:border-black prose-a:text-safety-orange prose-a:no-underline hover:prose-a:underline"
       >
         <PortableText value={post.body} />
       </div>
