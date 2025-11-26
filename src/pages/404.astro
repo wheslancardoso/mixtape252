@@ -1,0 +1,55 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="404 // FALHA NO SISTEMA">
+  <main class="min-h-screen bg-ink text-paper flex items-center justify-center relative overflow-hidden">
+    <!-- Efeito de Ruído no Fundo -->
+    <div class="noise-overlay opacity-20"></div>
+    
+    <!-- Conteúdo Central -->
+    <div class="container mx-auto px-4 text-center relative z-10 max-w-4xl">
+      <!-- Título Gigante -->
+      <h1 class="text-6xl md:text-9xl font-headline uppercase mb-8 leading-[0.9] tracking-tighter transform -rotate-1">
+        404
+      </h1>
+      
+      <div class="mb-12 transform rotate-1">
+        <h2 class="text-3xl md:text-5xl font-headline uppercase mb-6 text-safety-orange">
+          FALHA NO SISTEMA
+        </h2>
+        <p class="text-lg md:text-xl font-mono text-paper/90 max-w-2xl mx-auto leading-relaxed">
+          Você tentou acessar uma realidade que não existe.<br/>
+          Ou o link quebrou, ou nós deletamos de propósito.
+        </p>
+      </div>
+
+      <!-- Decoração Visual (Glitch) -->
+      <div class="mb-12 flex items-center justify-center gap-4 font-mono text-sm text-paper/60">
+        <span class="border-2 border-paper/30 px-4 py-2">ERROR</span>
+        <span class="border-2 border-paper/30 px-4 py-2">404</span>
+        <span class="border-2 border-paper/30 px-4 py-2">NULL</span>
+      </div>
+
+      <!-- Botão de Retorno -->
+      <a 
+        href="/" 
+        class="inline-block px-8 py-4 bg-safety-orange text-ink border-4 border-paper font-headline uppercase text-xl md:text-2xl tracking-wider shadow-[6px_6px_0px_0px_rgba(255,255,255,0.3)] hover:bg-ink hover:text-safety-orange hover:border-safety-orange transition-all transform hover:-rotate-1 hover:shadow-[8px_8px_0px_0px_rgba(255,77,0,0.5)]"
+      >
+        VOLTAR PARA O CAOS
+      </a>
+
+      <!-- Mensagem Extra (Opcional) -->
+      <p class="mt-12 font-mono text-xs text-paper/50 uppercase tracking-widest">
+        // ESTE ERRO É INTENCIONAL //<br/>
+        // OU NÃO //
+      </p>
+    </div>
+
+    <!-- Elementos Decorativos (Pontos de Ruído) -->
+    <div class="absolute top-20 left-10 w-2 h-2 bg-safety-orange opacity-50 animate-pulse"></div>
+    <div class="absolute bottom-32 right-16 w-3 h-3 bg-paper/20 border border-safety-orange transform rotate-45"></div>
+    <div class="absolute top-1/2 left-1/4 w-1 h-1 bg-paper/30"></div>
+  </main>
+</BaseLayout>
+

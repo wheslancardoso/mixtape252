@@ -4,9 +4,17 @@ import '../styles/global.css';
 interface Props {
   title?: string;
   description?: string;
+  image?: string;
+  type?: 'website' | 'article';
 }
 
-const { title = "MIXTAPE252", description = "Digital Zine & Creative Collective" } = Astro.props;
+const { title = "MIXTAPE252", description = "Digital Zine & Creative Collective", image, type = 'website' } = Astro.props;
+
+// Gera URL absoluta para a imagem OG
+const ogImageUrl = image 
+  ? new URL(image, Astro.site || Astro.url).toString()
+  : null;
+const siteUrl = Astro.site || (Astro.url ? new URL(Astro.url.pathname, Astro.url.origin).toString() : 'https://mixtape252.com');
 ---
 
 <!doctype html>
@@ -21,6 +29,20 @@ const { title = "MIXTAPE252", description = "Digital Zine & Creative Collective"
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
     <title>{title}</title>
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content={type} />
+    <meta property="og:url" content={siteUrl} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content={siteUrl} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    {ogImageUrl && <meta name="twitter:image" content={ogImageUrl} />}
   </head>
   <body class="bg-paper text-ink font-body overflow-x-hidden relative min-h-screen flex flex-col selection:bg-safety-orange selection:text-white cursor-crosshair">
     <div class="noise-overlay"></div>

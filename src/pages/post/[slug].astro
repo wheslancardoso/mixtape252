@@ -4,7 +4,10 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import { sanityClient, urlFor } from "../../lib/sanity";
 
 export async function getStaticPaths() {
-  const posts = await sanityClient.fetch(`*[_type == "post"]`);
+  const posts = await sanityClient.fetch(`*[_type == "post"]{
+    ...,
+    slug
+  }`);
   return posts.map((post: any) => ({
     params: { slug: post.slug.current },
     props: { post },
@@ -16,9 +19,23 @@ interface Props {
 }
 
 const { post } = Astro.props;
+
+// Gera URL da imagem OG dinâmica
+const ogImage = `/api/og?slug=${post.slug.current}`;
+
+// Prepara description (excerpt ou fallback)
+let description = post.excerpt || 'Digital Zine & Creative Collective';
+if (!post.excerpt && post.body && Array.isArray(post.body)) {
+  // Tenta extrair texto do primeiro bloco de texto do PortableText
+  const firstBlock = post.body.find((block: any) => block._type === 'block' && block.children);
+  if (firstBlock && firstBlock.children && firstBlock.children[0]) {
+    const text = firstBlock.children[0].text || '';
+    description = text.substring(0, 160) + (text.length > 160 ? '...' : '');
+  }
+}
 ---
 
-<BaseLayout title={post.title}>
+<BaseLayout title={post.title} description={description} image={ogImage} type="article">
   <article class="min-h-screen bg-white text-black">
     <header class="border-b-4 border-black pb-8 mb-12">
       <div class="container mx-auto px-4 pt-12">
