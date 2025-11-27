@@ -57,6 +57,21 @@ export default defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: 'tags',
+      title: 'Tags (Categorias)',
+      type: 'array',
+      of: [{ type: 'string' }],
+      options: {
+        layout: 'tags',
+      },
+      description:
+        'Adicione categorias específicas (ex: Hip-Hop, Noise, Cinema) para filtros futuros.',
+      validation: (Rule) =>
+        Rule.required()
+          .min(1)
+          .error('Adicione pelo menos uma tag para categorizar o post.'),
+    }),
+    defineField({
       name: 'body',
       title: 'Body',
       type: 'array',

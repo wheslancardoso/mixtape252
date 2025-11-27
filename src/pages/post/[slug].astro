@@ -6,7 +6,10 @@ import { sanityClient, urlFor } from "../../lib/sanity";
 export async function getStaticPaths() {
   const posts = await sanityClient.fetch(`*[_type == "post"]{
     ...,
-    slug
+    ...,
+    slug,
+    tags,
+    format
   }`);
   return posts.map((post: any) => ({
     params: { slug: post.slug.current },
@@ -165,18 +168,22 @@ const components = {
                     >Tags</span
                   >
                   <div class="flex flex-wrap gap-2">
+                    {/* 1. Format Tag (Destaque) */}
                     <span
-                      class="px-2 py-1 bg-ink text-white font-mono text-xs uppercase"
-                      >ZINE</span
+                      class="px-2 py-1 bg-safety-orange text-ink border-2 border-ink font-mono text-xs uppercase font-bold"
                     >
-                    <span
-                      class="px-2 py-1 bg-ink text-white font-mono text-xs uppercase"
-                      >CULTURE</span
-                    >
-                    <span
-                      class="px-2 py-1 bg-ink text-white font-mono text-xs uppercase"
-                      >DIGITAL</span
-                    >
+                      {post.format === "article" ? "ORIGINAL" : post.format}
+                    </span>
+
+                    {/* 2. Dynamic Tags from Sanity */}
+                    {
+                      post.tags &&
+                        post.tags.map((tag: string) => (
+                          <span class="px-2 py-1 bg-ink text-white font-mono text-xs uppercase">
+                            {tag}
+                          </span>
+                        ))
+                    }
                   </div>
                 </div>
               </div>
