@@ -67,7 +67,7 @@ const posts = await sanityClient.fetch(
                 data-image={post.mainImage ? urlFor(post.mainImage).width(1080).height(1080).url() : ''}
                 class="generate-btn w-full inline-flex items-center justify-center gap-2 bg-safety-orange text-ink px-4 py-3 font-headline uppercase text-sm border-2 border-paper hover:bg-paper hover:text-safety-orange transition-all shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
               >
-                <span>GERAR CARD [PNG]</span>
+                <span>GERAR CARD [JPG]</span>
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                   <polyline points="7 10 12 15 17 10"></polyline>
@@ -103,7 +103,7 @@ const posts = await sanityClient.fetch(
             <li>Clique em "GERAR CARD [PNG]" para baixar a imagem</li>
             <li>Processamento feito 100% no navegador (Client-Side)</li>
             <li>Alta fidelidade com texturas e fontes</li>
-            <li>Formato: 1080x1080px PNG</li>
+            <li>Formato: 1080x1080px JPG (Otimizado)</li>
           </ul>
         </div>
       </div>
@@ -199,13 +199,15 @@ const posts = await sanityClient.fetch(
             // Extra delay for fonts and overlay
             await new Promise(resolve => setTimeout(resolve, 800)); 
 
-            const dataUrl = await htmlToImage.toPng(template, {
-                quality: 1.0,
-                pixelRatio: 2, // 2x for Retina/Instagram Quality
+            const dataUrl = await htmlToImage.toJpeg(template, {
+                quality: 0.85,
+                pixelRatio: 1, // 1:1 Scale for optimized size
+                width: 1080,
+                height: 1080,
                 cacheBust: true,
             });
             
-            saveAs(dataUrl, `mixtape-${slug}.png`);
+            saveAs(dataUrl, `mixtape-${slug}.jpg`);
         } catch (error) {
             console.error('Erro ao gerar card:', error);
             alert('Erro ao gerar card. Verifique o console.');
