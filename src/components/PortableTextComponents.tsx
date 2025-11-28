@@ -7,21 +7,21 @@ export const SanityImage = ({ value }: any) => {
     }
 
     return (
-        <figure className="relative w-full my-8">
-            <div className="relative">
+        <figure className="relative w-auto max-w-full mx-auto my-12 block">
+            <div className="relative inline-block">
                 <img
-                    src={urlFor(value).width(800).fit('max').auto('format').url()}
+                    src={urlFor(value).width(1200).fit('max').auto('format').url()}
                     alt={value.alt || 'Post image'}
-                    className="w-full h-auto object-cover grayscale contrast-125"
+                    className="h-auto max-h-[70vh] border-4 border-ink shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transform -rotate-1 hover:rotate-0 transition-transform duration-300 contrast-125"
                 />
                 {/* Noise Overlay */}
                 <div
-                    className="absolute inset-0 mix-blend-overlay opacity-50 pointer-events-none"
+                    className="absolute inset-0 mix-blend-overlay opacity-40 pointer-events-none"
                     style={{ backgroundImage: "url('/overlay.png')", backgroundSize: 'cover' }}
                 />
             </div>
             {value.caption && (
-                <figcaption className="text-xs font-mono mt-2 text-gray-500 text-center uppercase tracking-wider">
+                <figcaption className="font-mono text-xs mt-3 p-1 bg-ink text-paper inline-block transform -rotate-1">
                     {value.caption}
                 </figcaption>
             )}
