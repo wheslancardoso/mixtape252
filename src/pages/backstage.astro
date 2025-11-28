@@ -114,6 +114,9 @@ const posts = await sanityClient.fetch(
   <!-- HIDDEN TEMPLATE FOR GENERATION -->
   <div class="fixed top-0 left-0 pointer-events-none opacity-0 overflow-hidden" style="z-index: -9999;">
     <div id="og-card-template" class="w-[1080px] h-[1080px] bg-[#f4f1ea] relative flex flex-col justify-between overflow-hidden">
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
+        </style>
         
         <!-- Background Image (VIBRANTE) -->
         <div class="absolute inset-0 z-0">
@@ -181,9 +184,11 @@ const posts = await sanityClient.fetch(
 
         if (!template || !templateImage || !templateTitle || !templateDate || !templateBadge) return;
 
-        // 1. UI Feedback
+        // 1. UI Feedback Inicial
         const originalText = btn.querySelector('span')!.innerText;
-        btn.querySelector('span')!.innerText = "CARREGANDO ASSETS...";
+        const setBtnText = (text: string) => { btn.querySelector('span')!.innerText = text; };
+        
+        setBtnText("CARREGANDO ASSETS... (0%)");
         (btn as HTMLButtonElement).disabled = true;
 
         try {
@@ -191,29 +196,44 @@ const posts = await sanityClient.fetch(
             templateImage.src = imageUrl || '';
             templateTitle.innerText = title || 'SEM TÍTULO';
             templateDate.innerText = date || 'DATA';
-            // Force Badge HTML to ensure colors
             templateBadge.innerHTML = '<span class="text-white">MIXTAPE</span><span class="text-safety-orange">252</span>';
 
-            // 3. CARREGAR FONTES (Crucial)
-            await document.fonts.load('1em Anton');
-            await document.fonts.load('1em Space Mono');
-            const fontsReady = document.fonts.check('1em Anton');
-            if (!fontsReady) console.warn('Font Anton might not be ready');
+            // 3. CARREGAMENTO AGRESSIVO DE FONTES
+            // Força o browser a baixar as fontes se ainda não estiverem lá
+            document.fonts.load('1em Anton');
+            document.fonts.load('1em Space Mono');
+
+            // Loop de Verificação (Polling) - Max 4 segundos
+            let attempts = 0;
+            const maxAttempts = 8; // 8 * 500ms = 4s
+            
+            while (attempts < maxAttempts) {
+                const antonReady = document.fonts.check('1em Anton');
+                const monoReady = document.fonts.check('1em Space Mono');
+                
+                if (antonReady && monoReady) {
+                    break;
+                }
+                
+                attempts++;
+                setBtnText(`CARREGANDO ASSETS... (${Math.round((attempts / maxAttempts) * 100)}%)`);
+                await new Promise(r => setTimeout(r, 500));
+            }
 
             // 4. CARREGAR IMAGEM PRINCIPAL
             if (!templateImage.complete) {
-                await new Promise((resolve, reject) => {
+                await new Promise((resolve) => {
                     templateImage.onload = resolve;
-                    templateImage.onerror = resolve; // Proceed anyway to avoid hanging
+                    templateImage.onerror = resolve;
                 });
             }
 
-            // 5. DELAY DE RENDERIZAÇÃO (Safety Buffer)
-            // Give the browser time to paint the styles (rotation, positioning)
-            btn.querySelector('span')!.innerText = "RENDERIZANDO...";
-            await new Promise(r => setTimeout(r, 800));
+            // 5. DELAY NUCLEAR (Safety Buffer)
+            // 2 segundos fixos para garantir que o layout estabilize
+            setBtnText("RENDERIZANDO...");
+            await new Promise(r => setTimeout(r, 2000));
 
-            // 6. GERAÇÃO (toJpeg)
+            // 6. GERAÇÃO
             const dataUrl = await toJpeg(template, {
                 quality: 0.9,
                 pixelRatio: 1,
@@ -226,10 +246,9 @@ const posts = await sanityClient.fetch(
 
         } catch (error) {
             console.error('Erro fatal na geração:', error);
-            alert('Erro ao gerar card. Tente novamente.');
+            alert('Erro ao gerar imagem. Tente novamente.');
         } finally {
-            // Reset UI
-            btn.querySelector('span')!.innerText = originalText;
+            setBtnText(originalText);
             (btn as HTMLButtonElement).disabled = false;
         }
       });
