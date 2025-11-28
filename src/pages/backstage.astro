@@ -132,7 +132,7 @@ const posts = await sanityClient.fetch(
             <!-- Top Badge (STICKER) -->
             <div class="absolute top-8 right-8 transform rotate-2">
                 <div class="bg-ink text-paper px-8 py-6 shadow-[-8px_8px_0px_0px_rgba(255,255,255,1)]">
-                    <span class="font-headline text-6xl uppercase leading-none block">
+                    <span id="template-badge" class="font-headline text-6xl uppercase leading-none block whitespace-nowrap">
                         <span class="text-white">MIXTAPE</span><span class="text-safety-orange">252</span>
                     </span>
                     <span id="template-date" class="font-mono text-xl uppercase tracking-widest block mt-2 text-center bg-white text-ink">DATA</span>
@@ -162,7 +162,7 @@ const posts = await sanityClient.fetch(
   </div>
 
   <script>
-    import * as htmlToImage from 'html-to-image';
+    import { toJpeg } from 'html-to-image';
     import { saveAs } from 'file-saver';
 
     const buttons = document.querySelectorAll('.generate-btn');
@@ -170,6 +170,7 @@ const posts = await sanityClient.fetch(
     const templateImage = document.getElementById('template-image') as HTMLImageElement;
     const templateTitle = document.getElementById('template-title');
     const templateDate = document.getElementById('template-date');
+    const templateBadge = document.getElementById('template-badge');
 
     buttons.forEach(btn => {
       btn.addEventListener('click', async () => {
@@ -178,48 +179,56 @@ const posts = await sanityClient.fetch(
         const date = btn.getAttribute('data-date');
         const imageUrl = btn.getAttribute('data-image');
 
-        if (!template || !templateImage || !templateTitle || !templateDate) return;
+        if (!template || !templateImage || !templateTitle || !templateDate || !templateBadge) return;
 
-        // Update Template Data
-        templateImage.src = imageUrl || '';
-        templateTitle.innerText = title || 'SEM TÍTULO';
-        templateDate.innerText = date || 'DATA';
-
-        // Feedback visual
+        // 1. UI Feedback
         const originalText = btn.querySelector('span')!.innerText;
-        btn.querySelector('span')!.innerText = "PROCESSANDO...";
+        btn.querySelector('span')!.innerText = "CARREGANDO ASSETS...";
         (btn as HTMLButtonElement).disabled = true;
 
         try {
-            // Wait for image load (Crucial for high res)
-            await new Promise((resolve) => {
-                if (templateImage.complete) {
-                    resolve(true);
-                } else {
-                    templateImage.onload = () => resolve(true);
-                    templateImage.onerror = () => resolve(true); // Proceed anyway
-                }
-            });
-            
-            // Wait for fonts to be ready
-            await document.fonts.ready;
+            // 2. INJETAR DADOS
+            templateImage.src = imageUrl || '';
+            templateTitle.innerText = title || 'SEM TÍTULO';
+            templateDate.innerText = date || 'DATA';
+            // Force Badge HTML to ensure colors
+            templateBadge.innerHTML = '<span class="text-white">MIXTAPE</span><span class="text-safety-orange">252</span>';
 
-            // Extra delay for fonts and overlay (Safety buffer)
-            await new Promise(resolve => setTimeout(resolve, 100)); 
+            // 3. CARREGAR FONTES (Crucial)
+            await document.fonts.load('1em Anton');
+            await document.fonts.load('1em Space Mono');
+            const fontsReady = document.fonts.check('1em Anton');
+            if (!fontsReady) console.warn('Font Anton might not be ready');
 
-            const dataUrl = await htmlToImage.toJpeg(template, {
-                quality: 0.85,
-                pixelRatio: 1, // 1:1 Scale for optimized size
+            // 4. CARREGAR IMAGEM PRINCIPAL
+            if (!templateImage.complete) {
+                await new Promise((resolve, reject) => {
+                    templateImage.onload = resolve;
+                    templateImage.onerror = resolve; // Proceed anyway to avoid hanging
+                });
+            }
+
+            // 5. DELAY DE RENDERIZAÇÃO (Safety Buffer)
+            // Give the browser time to paint the styles (rotation, positioning)
+            btn.querySelector('span')!.innerText = "RENDERIZANDO...";
+            await new Promise(r => setTimeout(r, 800));
+
+            // 6. GERAÇÃO (toJpeg)
+            const dataUrl = await toJpeg(template, {
+                quality: 0.9,
+                pixelRatio: 1,
                 width: 1080,
-                height: 1080,
-                cacheBust: true,
+                height: 1080
             });
-            
+
+            // 7. SALVAR
             saveAs(dataUrl, `mixtape-${slug}.jpg`);
+
         } catch (error) {
-            console.error('Erro ao gerar card:', error);
-            alert('Erro ao gerar card. Verifique o console.');
+            console.error('Erro fatal na geração:', error);
+            alert('Erro ao gerar card. Tente novamente.');
         } finally {
+            // Reset UI
             btn.querySelector('span')!.innerText = originalText;
             (btn as HTMLButtonElement).disabled = false;
         }
