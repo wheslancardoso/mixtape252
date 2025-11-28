@@ -117,7 +117,7 @@ const posts = await sanityClient.fetch(
         
         <!-- Background Image (VIBRANTE) -->
         <div class="absolute inset-0 z-0">
-            <img id="template-image" src="" class="w-full h-full object-cover contrast-125 brightness-90" />
+            <img id="template-image" src="" crossorigin="anonymous" class="w-full h-full object-cover contrast-125 brightness-90" />
         </div>
 
         <!-- Noise Overlay (TEXTURE) -->
@@ -201,8 +201,11 @@ const posts = await sanityClient.fetch(
                 }
             });
             
-            // Extra delay for fonts and overlay
-            await new Promise(resolve => setTimeout(resolve, 800)); 
+            // Wait for fonts to be ready
+            await document.fonts.ready;
+
+            // Extra delay for fonts and overlay (Safety buffer)
+            await new Promise(resolve => setTimeout(resolve, 100)); 
 
             const dataUrl = await htmlToImage.toJpeg(template, {
                 quality: 0.85,
