@@ -25,6 +25,45 @@ const posts = await sanityClient.fetch(
         </p>
       </div>
 
+      <!-- MÁQUINA DE CRIAÇÃO (IA) -->
+      <div class="border-4 border-safety-orange p-6 mb-12 bg-black/80 relative overflow-hidden group">
+        <div class="absolute top-0 right-0 bg-safety-orange text-ink font-mono text-xs px-2 py-1 uppercase font-bold">
+          BETA v0.9
+        </div>
+        
+        <h2 class="font-headline text-3xl text-safety-orange uppercase mb-6 flex items-center gap-2">
+          <span class="animate-pulse">⚡</span> MÁQUINA DE CRIAÇÃO
+        </h2>
+
+        <div class="flex flex-col md:flex-row gap-4">
+          <input 
+            type="text" 
+            id="topic-input"
+            placeholder="Ex: O impacto do 808s & Heartbreak..." 
+            class="flex-1 bg-ink border-2 border-paper text-paper p-4 font-mono text-sm focus:outline-none focus:border-safety-orange placeholder:text-paper/30 uppercase"
+          />
+          
+          <button 
+            id="btn-create-specific"
+            class="bg-paper text-ink px-6 py-4 font-headline uppercase text-sm border-2 border-paper hover:bg-safety-orange hover:border-safety-orange transition-all whitespace-nowrap"
+          >
+            CRIAR PAUTA
+          </button>
+          
+          <button 
+            id="btn-create-random"
+            class="bg-transparent text-safety-orange px-6 py-4 font-headline uppercase text-sm border-2 border-safety-orange hover:bg-safety-orange hover:text-ink transition-all whitespace-nowrap"
+          >
+            SORTEAR TEMA CULT 🎲
+          </button>
+        </div>
+
+        <!-- Feedback Area -->
+        <div id="generation-feedback" class="mt-4 font-mono text-xs hidden">
+          <p class="text-paper/70 animate-pulse">>>> CONECTANDO AO ORÁCULO (OPENAI)... AGUARDE...</p>
+        </div>
+      </div>
+
       <!-- Grid de Posts -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {posts.map((post: any) => (
@@ -253,6 +292,57 @@ const posts = await sanityClient.fetch(
         }
       });
     });
+  </script>
+
+  <script>
+    // --- LÓGICA DO GERADOR DE PAUTAS ---
+    const topicInput = document.getElementById('topic-input') as HTMLInputElement;
+    const btnSpecific = document.getElementById('btn-create-specific') as HTMLButtonElement;
+    const btnRandom = document.getElementById('btn-create-random') as HTMLButtonElement;
+    const feedback = document.getElementById('generation-feedback');
+
+    async function handleGeneration(mode: 'specific' | 'random') {
+        const topic = topicInput?.value;
+        
+        if (mode === 'specific' && !topic) {
+            alert('DIGITE UM TÓPICO!');
+            return;
+        }
+
+        // UI Loading
+        if (feedback) feedback.classList.remove('hidden');
+        if (btnSpecific) btnSpecific.disabled = true;
+        if (btnRandom) btnRandom.disabled = true;
+
+        try {
+            const response = await fetch('/api/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ topic, mode })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert(`SUCESSO: "${data.title}" foi adicionado à Fila!`);
+                if (topicInput) topicInput.value = ''; // Limpa
+            } else {
+                alert(`ERRO: ${data.error || 'Falha desconhecida'}`);
+            }
+
+        } catch (err) {
+            console.error(err);
+            alert('ERRO DE CONEXÃO.');
+        } finally {
+            // UI Reset
+            if (feedback) feedback.classList.add('hidden');
+            if (btnSpecific) btnSpecific.disabled = false;
+            if (btnRandom) btnRandom.disabled = false;
+        }
+    }
+
+    if (btnSpecific) btnSpecific.addEventListener('click', () => handleGeneration('specific'));
+    if (btnRandom) btnRandom.addEventListener('click', () => handleGeneration('random'));
   </script>
 </BaseLayout>
 
