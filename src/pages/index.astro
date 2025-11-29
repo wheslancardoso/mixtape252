@@ -1,11 +1,12 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { sanityClient, urlFor } from "../lib/sanity";
+import { sanityClient, sanityWriteClient, urlFor } from "../lib/sanity";
 import Newsletter from "../components/Newsletter.astro";
 
 // Fetch Latest Drop (Hero)
+// Fetch Latest Drop (Hero)
 const latestDrop =
-    await sanityClient.fetch(`*[_type == "drop"] | order(publishedAt desc)[0]{
+    await sanityWriteClient.fetch(`*[_type == "drop"] | order(publishedAt desc)[0]{
   title,
   slug,
   publishedAt,
@@ -15,7 +16,7 @@ const latestDrop =
 
 // Fetch Latest Posts (Feed)
 const latestPosts =
-    await sanityClient.fetch(`*[_type == "post"] | order(publishedAt desc)[0..5]{
+    await sanityWriteClient.fetch(`*[_type == "post" && !(_id in path("drafts.**"))] | order(publishedAt desc)[0..5]{
   title, 
   slug, 
   publishedAt, 
@@ -23,6 +24,11 @@ const latestPosts =
   excerpt,
   format
 }`);
+
+console.log("------------------------------------------------");
+console.log("🏠 [HOME] Posts recuperados para a capa:");
+latestPosts.forEach((p: any) => console.log(`- ${p.title} (${p.publishedAt})`));
+console.log("------------------------------------------------");
 
 // Helper function for format styling
 function getFormatStyle(format: string) {

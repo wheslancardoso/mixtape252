@@ -10,8 +10,12 @@ export const sanityClient = createClient({
   projectId,
   dataset,
   apiVersion,
-  useCdn: true, // Set to false if statically generating pages, using ISR or tag-based revalidation
+  useCdn: false, // Set to false if statically generating pages, using ISR or tag-based revalidation
 });
+
+console.log('Sanity Client Configured. CDN:', false);
+console.log(`Sanity Project ID: ${projectId}`);
+console.log(`Sanity Dataset: ${dataset}`);
 
 // Cliente com permissão de escrita (para API routes)
 export const sanityWriteClient = createClient({

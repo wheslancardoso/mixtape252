@@ -1,16 +1,16 @@
 ---
 import { PortableText } from "@portabletext/react";
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { sanityClient, urlFor } from "../../lib/sanity";
+import { sanityClient, sanityWriteClient, urlFor } from "../../lib/sanity";
 
 export async function getStaticPaths() {
-  const posts = await sanityClient.fetch(`*[_type == "post"]{
-    ...,
+  const posts = await sanityWriteClient.fetch(`*[_type == "post"]{
     ...,
     slug,
     tags,
     format
   }`);
+
   return posts.map((post: any) => ({
     params: { slug: post.slug.current },
     props: { post },
