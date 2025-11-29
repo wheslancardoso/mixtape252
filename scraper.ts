@@ -31,6 +31,7 @@ O FILTRO DE OURO ("VISIONARY CHECK"):
 1. MAINSTREAM ARTÍSTICO (SIM): Se for Tyler The Creator, Kendrick, Radiohead, Rosalia, A24... APROVE. O critério é: "Tem direção de arte? Inova? É relevante?"
 2. MAINSTREAM FÚTIL (NÃO): Fofocas, charts, pop genérico de fábrica, polêmicas de Twitter. IGNORE.
 3. UNDERGROUND (COM CRITÉRIO): Só aprove se for promissor ou esteticamente interessante. Evite "bandas de garagem" genéricas ou lançamentos irrelevantes.
+4. RUÍDO DE AGENDA (NÃO): **IGNORE Notícias de Serviço/Logística, incluindo:** Anúncios de Line-up de Festivais, Datas de Turnê/Shows, Venda de Ingressos, Lançamento de Merch e Atualizações de Apps.
 
 DIRETRIZES DE TEXTO (JORNALISMO CULTURAL):
 - TÍTULO: Natural e informativo em PT-BR. (Ex: "Tyler, The Creator anuncia nova era com teaser visual").

@@ -2,68 +2,65 @@ import type { APIRoute } from 'astro';
 import OpenAI from 'openai';
 import { createClient } from '@sanity/client';
 import crypto from 'crypto';
+import slugify from 'slugify';
+
+// Força a renderização no servidor (SSR) para esta rota
+export const prerender = false;
 
 export const POST: APIRoute = async ({ request }) => {
+    console.log('API /api/generate chamada...'); // Log para debug
+
     try {
-        const { topic, mode } = await request.json();
+        // 1. Carregar Variáveis (Priorizando Astro)
+        const projectId = import.meta.env.SANITY_PROJECT_ID || import.meta.env.PUBLIC_SANITY_PROJECT_ID || process.env.SANITY_PROJECT_ID;
+        const dataset = import.meta.env.SANITY_DATASET || import.meta.env.PUBLIC_SANITY_DATASET || process.env.SANITY_DATASET;
+        const token = import.meta.env.SANITY_API_TOKEN || process.env.SANITY_API_TOKEN;
+        const openaiKey = import.meta.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY;
 
-        if (!topic && mode !== 'random') {
-            return new Response(JSON.stringify({ error: 'Topic is required unless mode is random' }), { status: 400 });
+        // Debug no Terminal (mostra status sem revelar segredos)
+        console.log('Configuração Carregada:', {
+            projectId: projectId ? 'OK' : 'FALTANDO',
+            dataset: dataset ? 'OK' : 'FALTANDO',
+            token: token ? 'OK' : 'FALTANDO',
+            openaiKey: openaiKey ? 'OK' : 'FALTANDO'
+        });
+
+        if (!projectId || !token || !openaiKey) {
+            throw new Error(`Configuração incompleta no .env. Verifique o terminal.`);
         }
 
-        // --- CONFIGURATION ---
-        const PROJECT_ID = import.meta.env.SANITY_PROJECT_ID || import.meta.env.PUBLIC_SANITY_PROJECT_ID || process.env.SANITY_PROJECT_ID || process.env.PUBLIC_SANITY_PROJECT_ID;
-        const DATASET = import.meta.env.SANITY_DATASET || import.meta.env.PUBLIC_SANITY_DATASET || process.env.SANITY_DATASET || process.env.PUBLIC_SANITY_DATASET;
-        const TOKEN = import.meta.env.SANITY_API_TOKEN || process.env.SANITY_API_TOKEN;
-        const OPENAI_KEY = import.meta.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY;
-
-        if (!PROJECT_ID || !DATASET || !TOKEN || !OPENAI_KEY) {
-            return new Response(JSON.stringify({ error: 'Missing server configuration' }), { status: 500 });
+        // 2. Ler o Corpo da Requisição
+        const body = await request.json().catch(() => null);
+        if (!body) {
+            throw new Error('Corpo da requisição inválido ou vazio.');
         }
+        const { topic, mode } = body;
 
+        // 3. Configurar Clientes
         const sanity = createClient({
-            projectId: PROJECT_ID,
-            dataset: DATASET,
-            token: TOKEN,
+            projectId,
+            dataset,
+            token,
             useCdn: false,
             apiVersion: '2024-03-01',
         });
 
-        const openai = new OpenAI({ apiKey: OPENAI_KEY });
+        const openai = new OpenAI({ apiKey: openaiKey });
 
-        // --- PROMPT ---
+        // 4. Prompt & Geração
         const SYSTEM_PROMPT = `
-Você é o Editor-Chefe da 'Mixtape252', uma plataforma de cultura visual e sonora.
-SUA MISSÃO: Filtrar o ruído da internet e encontrar a Excelência Artística.
+        Você é o Editor-Chefe da 'Mixtape252'. 
+        SUA MISSÃO: Criar pautas de cultura visual/sonora de ALTA QUALIDADE.
+        ESTILO: Jornalístico, ácido, técnico. Sem gírias forçadas. Use títulos diretos.
+        FORMATO JSON: { "title": "...", "body": "...", "tags": [], "format": "article" }
+        `;
 
-O FILTRO DE OURO ("VISIONARY CHECK"):
-1. MAINSTREAM ARTÍSTICO (SIM): Se for Tyler The Creator, Kendrick, Radiohead, Rosalia, A24... APROVE. O critério é: "Tem direção de arte? Inova? É relevante?"
-2. MAINSTREAM FÚTIL (NÃO): Fofocas, charts, pop genérico de fábrica, polêmicas de Twitter. IGNORE.
-3. UNDERGROUND (COM CRITÉRIO): Só aprove se for promissor ou esteticamente interessante. Evite "bandas de garagem" genéricas ou lançamentos irrelevantes.
+        const userPrompt = mode === 'random'
+            ? 'Gere uma pauta aleatória sobre um clássico cult, movimento underground ou estética visual esquecida.'
+            : `Gere uma pauta jornalística sobre: "${topic}".`;
 
-DIRETRIZES DE TEXTO (JORNALISMO CULTURAL):
-- TÍTULO: Natural e informativo em PT-BR. (Ex: "Tyler, The Creator anuncia nova era com teaser visual").
-- PROIBIDO: Traduções literais ("Derruba álbum", "Chuta turnê"). Use "Lança", "Inicia".
-- CORPO: 2 parágrafos. 1º Fatos (O que/Quem). 2º Contexto/Vibe (Por que importa).
+        console.log('Perguntando para a IA...');
 
-FORMATO (JSON):
-{
-  "skip": boolean,
-  "title": "Título jornalístico em PT-BR",
-  "body": "Texto rico e contextualizado.",
-  "tags": ["Gênero", "Cena"],
-  "format": "news"
-}
-`;
-
-        let userPrompt = '';
-        if (mode === 'random') {
-            userPrompt = 'Gere uma pauta aleatória sobre um lançamento recente ou clássico cult de música, cinema ou arte visual que se encaixe na estética Visionary/Underground.';
-        } else {
-            userPrompt = `Gere uma pauta sobre este tópico: "${topic}". Certifique-se de que se encaixa na estética Visionary/Underground.`;
-        }
-
-        // --- AI GENERATION ---
         const completion = await openai.chat.completions.create({
             model: 'gpt-4o',
             messages: [
@@ -74,30 +71,44 @@ FORMATO (JSON):
         });
 
         const data = JSON.parse(completion.choices[0].message.content || '{}');
+        console.log('IA Respondeu:', data.title);
 
-        if (data.skip) {
-            return new Response(JSON.stringify({ error: 'AI skipped this topic as irrelevant', data }), { status: 400 });
-        }
-
-        // --- SAVE TO SANITY ---
-        const linkHash = crypto.createHash('md5').update(data.title + Date.now()).digest('hex');
+        // 5. Salvar DIRETO COMO RASCUNHO (Skip Queue)
+        const slug = slugify(data.title, { lower: true, strict: true }).slice(0, 90);
+        const draftId = `drafts.gen.${crypto.createHash('md5').update(data.title).digest('hex')}`;
 
         await sanity.createIfNotExists({
-            _id: `queue.gen.${linkHash}`,
-            _type: 'queue',
+            _id: draftId,
+            _type: 'post', // Agora é um Post real
             title: data.title,
-            body: data.body,
-            link: 'https://mixtape252.com/generated', // Placeholder for generated content
-            source: 'AI Generator',
-            format: (data.format || 'news').toLowerCase(),
-            tags: data.tags || ['Generated'],
-            aiJson: JSON.stringify(data)
+            slug: { _type: 'slug', current: slug },
+            format: 'article', // Pautas manuais geralmente são artigos/ensaios
+            tags: data.tags || ['Original'],
+            publishedAt: new Date().toISOString(),
+            body: [
+                {
+                    _type: 'block',
+                    children: [{ _type: 'span', text: data.body }]
+                }
+            ]
         });
 
-        return new Response(JSON.stringify({ success: true, message: 'Pauta criada na Fila!', title: data.title }), { status: 200 });
+        console.log('Salvo no Sanity com sucesso.');
+
+        return new Response(JSON.stringify({ success: true, title: data.title }), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' }
+        });
 
     } catch (error: any) {
-        console.error('Error generating content:', error);
-        return new Response(JSON.stringify({ error: error.message || 'Internal Server Error' }), { status: 500 });
+        console.error('❌ Erro na API:', error);
+        // Retorna o erro como JSON para o frontend não quebrar com "Unexpected end of JSON"
+        return new Response(JSON.stringify({
+            error: error.message || 'Erro interno no servidor',
+            details: error.stack
+        }), {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' }
+        });
     }
 };
