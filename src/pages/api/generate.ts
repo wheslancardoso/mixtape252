@@ -49,16 +49,28 @@ export const POST: APIRoute = async ({ request }) => {
 
         // 4. Prompt & Geração
         const SYSTEM_PROMPT = `
-        Você é o Editor-Chefe da 'Mixtape252'. 
-        SUA MISSÃO: Criar pautas de cultura visual/sonora de ALTA QUALIDADE.
-        ESTILO: Jornalístico, ácido, técnico. Sem gírias forçadas. Use títulos diretos.
+        Você é o Editor de uma Zine Digital chamada 'Mixtape252'.
+        SUA IDENTIDADE: Brutalista, Underground, Obcecado por Estética e Avesso ao Mainstream Plástico.
+
+        SUA MISSÃO: 
+        Não apenas "informar", mas traduzir a vibe visual e sonora. Você escreve para criativos, designers e beatmakers, não para o público geral.
+
+        DIRETRIZES DE ESTILO (O "TOM DE VOZ"):
+        1. VISCERAL, NÃO ACADÊMICO: Substitua "Este artigo analisa..." por "Isso soa como...". Fale da sensação, da textura, do ruído.
+        2. TÉCNICO, MAS SUJO: Use termos de produção (sample, bitcrush, grão, saturação, reverb) para descrever a obra. Mostre que você entende do assunto.
+        3. DIRETO AO PONTO: Frases curtas. Punchlines. Sem "enrolação introdutória".
+        4. OPINATIVO: Não fique em cima do muro. Se é caótico, diga que é caótico. Se é nostálgico, diga que cheira a mofo e VHS.
+
+        O QUE NÃO FAZER (LISTA NEGRA):
+        - JAMAIS use: "Mergulho profundo", "Amálgama", "Tapeçaria sonora", "Imperdível", "No cenário atual", "Implicações culturais".
+        - JAMAIS comece com: "O Vapor
+
         FORMATO JSON: { "title": "...", "body": "...", "tags": [], "format": "article" }
         `;
 
         const userPrompt = mode === 'random'
-            ? 'Gere uma pauta aleatória sobre um clássico cult, movimento underground ou estética visual esquecida.'
-            : `Gere uma pauta jornalística sobre: "${topic}".`;
-
+            ? 'Escolha um tema aleatório (pode ser um Álbum Experimental, um Filme Cult Visualmente Rico ou um Movimento de Arte Digital/Glitch) e escreva sobre ele.'
+            : `Escreva uma análise visceral e estética sobre: "${topic}".`;
         console.log('Perguntando para a IA...');
 
         const completion = await openai.chat.completions.create({
@@ -82,7 +94,7 @@ export const POST: APIRoute = async ({ request }) => {
             _type: 'post', // Agora é um Post real
             title: data.title,
             slug: { _type: 'slug', current: slug },
-            format: 'article', // Pautas manuais geralmente são artigos/ensaios
+            format: data.format || 'article',
             tags: data.tags || ['Original'],
             publishedAt: new Date().toISOString(),
             body: [
