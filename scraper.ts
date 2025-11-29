@@ -145,7 +145,7 @@ async function runIngestion() {
             // Ignora erros de feed individual
         }
     }
-    console.log('\n🏁 Coleta finalizada. Verifique a aba "Fila" no Sanity.');
+    console.log('\n🏁 Coleta finalizada. Itens aguardando curadoria na Fila.');
 }
 
 runIngestion();
