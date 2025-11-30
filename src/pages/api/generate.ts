@@ -15,7 +15,7 @@ export const POST: APIRoute = async ({ request }) => {
         const projectId = import.meta.env.SANITY_PROJECT_ID || import.meta.env.PUBLIC_SANITY_PROJECT_ID || process.env.SANITY_PROJECT_ID;
         const dataset = import.meta.env.SANITY_DATASET || import.meta.env.PUBLIC_SANITY_DATASET || process.env.SANITY_DATASET;
         const token = import.meta.env.SANITY_API_TOKEN || process.env.SANITY_API_TOKEN;
-        const openaiKey = import.meta.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY;
+        const openaiKey = process.env.OPENAI_API_KEY || import.meta.env.OPENAI_API_KEY;
 
         // Debug no Terminal (mostra status sem revelar segredos)
         console.log('Configuração Carregada:', {

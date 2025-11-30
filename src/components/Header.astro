@@ -1,0 +1,46 @@
+<header
+    class="fixed top-0 left-0 w-full bg-paper/95 backdrop-blur-md text-ink border-b-8 z-50 h-24 flex items-center shadow-hard transition-colors duration-300"
+    style="border-color: var(--theme-border)"
+>
+    <div
+        class="w-full max-w-7xl mx-auto px-8 flex justify-between items-center"
+    >
+        {/* Logo */}
+        <a
+            href="/"
+            class="font-headline text-4xl md:text-5xl tracking-tighter uppercase group flex items-baseline gap-1"
+        >
+            <span
+                class="text-ink transition-colors duration-300 hover:text-[var(--theme-accent)]"
+                >MIXTAPE</span
+            >
+            <span class="text-[var(--theme-accent)]">252</span>
+        </a>
+
+        {/* Nav Desktop */}
+        <nav class="hidden md:flex">
+            <ul class="flex gap-12">
+                {
+                    ["Drops", "Feed", "Manifesto"].map((item) => (
+                        <li>
+                            <a
+                                href={`/${item.toLowerCase() === "feed" ? "posts" : item.toLowerCase().replace("manifesto", "sobre")}`}
+                                class="font-headline text-2xl text-ink uppercase tracking-wide transition-colors hover:text-[var(--theme-accent)]"
+                            >
+                                {item}
+                            </a>
+                        </li>
+                    ))
+                }
+            </ul>
+        </nav>
+
+        {/* Mobile Trigger (Agora com ID correto e cor dinâmica) */}
+        <button
+            id="mobile-menu-trigger"
+            class="md:hidden text-ink cursor-pointer hover:text-[var(--theme-accent)] transition-colors"
+        >
+            <span class="material-symbols-outlined text-4xl">menu</span>
+        </button>
+    </div>
+</header>

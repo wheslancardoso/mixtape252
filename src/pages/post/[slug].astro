@@ -2,49 +2,7 @@
 import { PortableText } from "@portabletext/react";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import ChannelBadge from "../../components/ChannelBadge.astro";
-import { sanityClient, sanityWriteClient, urlFor } from "../../lib/sanity";
-
-export async function getStaticPaths() {
-  const posts = await sanityWriteClient.fetch(`*[_type == "post"]{
-    ...,
-    slug,
-    tags,
-    slug,
-    tags,
-    format,
-    channel
-  }`);
-
-  return posts.map((post: any) => ({
-    params: { slug: post.slug.current },
-    props: { post },
-  }));
-}
-
-interface Props {
-  post: any;
-}
-
-const { post } = Astro.props;
-
-// Gera URL da imagem OG dinâmica
-const ogImage = `/api/og?slug=${post.slug.current}`;
-
-// Prepara description (excerpt ou fallback)
-let description = post.excerpt || "Digital Zine & Creative Collective";
-if (!post.excerpt && post.body && Array.isArray(post.body)) {
-  // Tenta extrair texto do primeiro bloco de texto do PortableText
-  const firstBlock = post.body.find(
-    (block: any) => block._type === "block" && block.children,
-  );
-  if (firstBlock && firstBlock.children && firstBlock.children[0]) {
-    const text = firstBlock.children[0].text || "";
-    description = text.substring(0, 160) + (text.length > 160 ? "..." : "");
-  }
-}
-
-const source = Astro.url.searchParams.get("source");
-
+import { sanityWriteClient, urlFor } from "../../lib/sanity";
 import Blockquote from "../../components/Blockquote";
 import {
   H2,
@@ -54,54 +12,92 @@ import {
   SanityImage,
 } from "../../components/PortableTextComponents";
 
-// Custom components for PortableText
+export async function getStaticPaths() {
+  // FIX: Filtra posts com slug definido e exclui rascunhos explicitamente
+  const posts =
+    await sanityWriteClient.fetch(`*[_type == "post" && defined(slug.current) && !(_id in path("drafts.**"))]{ 
+    slug,
+    channel 
+  }`);
+
+  return posts.map((post: any) => ({
+    params: { slug: post.slug.current },
+  }));
+}
+
+const { slug } = Astro.params;
+const post = await sanityWriteClient.fetch(
+  `*[_type == "post" && slug.current == $slug][0]`,
+  { slug },
+);
+
+if (!post) return Astro.redirect("/404");
+
+// 1. Definição dos Temas (Mantendo estética Zine)
+function getTheme(channel: string) {
+  switch (channel) {
+    case "system_log": // Tech / Code
+      return {
+        accent: "#34d399", // Verde Neon
+        border: "#065f46", // Verde Escuro
+        bg: "#09090b", // Preto Zinco
+        text: "#34d399", // Texto Verde
+        prose: "prose-invert prose-emerald",
+      };
+    case "pixel_trash": // Art / Vaporwave
+      return {
+        accent: "#f472b6", // Rosa Neon
+        border: "#831843", // Roxo Escuro
+        bg: "#1a0b2e", // Roxo Profundo
+        text: "#f472b6", // Texto Rosa
+        prose: "prose-invert prose-pink",
+      };
+    default: // Distorção (Padrão)
+      return {
+        accent: "#ff4d00", // Laranja Safety
+        border: "#111111", // Preto Tinta
+        bg: "#f4f1ea", // Papel
+        text: "#111111", // Texto Preto
+        prose: "prose-neutral",
+      };
+  }
+}
+
+const theme = getTheme(post.channel);
+
 const components = {
-  block: {
-    blockquote: Blockquote,
-    h2: H2,
-    h3: H3,
-  },
-  list: {
-    bullet: BulletList,
-    number: NumberList,
-  },
-  types: {
-    image: SanityImage,
-  },
+  block: { blockquote: Blockquote, h2: H2, h3: H3 },
+  list: { bullet: BulletList, number: NumberList },
+  types: { image: SanityImage },
 };
 ---
 
 <BaseLayout
   title={post.title}
-  description={description}
-  image={ogImage}
-  type="article"
+  description={post.excerpt}
+  image={post.mainImage ? urlFor(post.mainImage).url() : null}
+  accentColor={theme.accent}
+  borderColor={theme.border}
+  pageBg={theme.bg}
 >
-  <article class="min-h-screen bg-paper text-ink overflow-x-hidden">
-    {/* 1. HERO SECTION: Full Width, Imagem Gigante, Título Sobreposto */}
+  <article
+    class="min-h-screen overflow-x-hidden selection:text-white"
+    style={`color: ${theme.text}; selection:background-color: ${theme.accent};`}
+  >
+    {/* HERO SECTION */}
     <header
-      class="relative w-full h-[80vh] border-b-4 border-ink overflow-hidden"
+      class="relative w-full h-[70vh] border-b-4 overflow-hidden group"
+      style={`border-color: ${theme.border}`}
     >
       {
         post.mainImage ? (
-          <div class="absolute inset-0 w-full h-full">
+          <div class="absolute inset-0">
             <img
-              src={urlFor(post.mainImage)
-                .width(1920)
-                .height(1080)
-                .fit("crop")
-                .url()}
+              src={urlFor(post.mainImage).width(1920).height(1080).url()}
               alt={post.title}
-              class="w-full h-full object-cover grayscale contrast-125 brightness-75"
+              class="w-full h-full object-cover grayscale contrast-125 brightness-75 transition-all duration-700 group-hover:grayscale-0"
             />
-            {/* Noise Overlay */}
-            <div
-              class="absolute inset-0 pointer-events-none z-10 opacity-40 mix-blend-overlay"
-              style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E")`,
-              }}
-            />
-            <div class="absolute inset-0 bg-gradient-to-t from-ink via-transparent to-transparent opacity-80 z-20" />
+            <div class="absolute inset-0 bg-black/40 mix-blend-multiply" />
           </div>
         ) : (
           <div class="absolute inset-0 bg-ink flex items-center justify-center">
@@ -112,10 +108,13 @@ const components = {
         )
       }
 
-      <div class="absolute bottom-0 left-0 w-full p-4 md:p-12 z-20">
+      <div class="absolute bottom-0 left-0 w-full p-6 md:p-12 z-20">
         <div class="max-w-7xl mx-auto">
+          <div class="mb-4">
+            <ChannelBadge channel={post.channel} />
+          </div>
           <h1
-            class="text-6xl md:text-8xl lg:text-9xl font-headline uppercase leading-[0.85] tracking-tighter text-white drop-shadow-[8px_8px_0px_rgba(0,0,0,1)] break-words"
+            class="text-5xl md:text-8xl lg:text-9xl font-headline uppercase leading-[0.85] text-white drop-shadow-[6px_6px_0px_#000] tracking-tighter"
           >
             {post.title}
           </h1>
@@ -123,122 +122,70 @@ const components = {
       </div>
     </header>
 
-    {/* Divisor ASCII */}
-    <div class="py-4 px-4 text-center border-b-4 border-ink bg-paper">
-      <div
-        class="font-mono text-xs md:text-sm tracking-widest text-ink overflow-hidden whitespace-nowrap"
-      >
-        //----------------//----------------//----------------//----------------//----------------//----------------//
-      </div>
-    </div>
-
-    {/* 2. LAYOUT DE LEITURA: Grid Editorial */}
-    <div class="max-w-7xl mx-auto px-4 py-12 md:py-20">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
-        {/* COLUNA ESQUERDA: Conteúdo (8 cols) */}
-        <div class="lg:col-span-8">
-          <div
-            class="prose prose-xl max-w-none font-mono text-ink leading-relaxed prose-p:text-justify prose-a:text-safety-orange prose-a:no-underline hover:prose-a:underline prose-strong:bg-ink prose-strong:text-white prose-strong:px-1"
-          >
-            <PortableText value={post.body} components={components} />
-          </div>
+    {/* CONTENT GRID */}
+    <div
+      class="max-w-7xl mx-auto px-4 py-12 md:py-20 grid grid-cols-1 lg:grid-cols-12 gap-12"
+    >
+      {/* Coluna Texto */}
+      <div class="lg:col-span-8">
+        <div
+          class={`prose prose-xl max-w-none font-mono leading-relaxed ${theme.prose} prose-headings:font-headline hover:prose-a:text-[var(--theme-accent)]`}
+        >
+          <PortableText value={post.body} components={components} />
         </div>
+      </div>
 
-        {/* COLUNA DIREITA: Contexto/Sidebar (4 cols) */}
-        <aside class="lg:col-span-4 relative">
-          <div class="sticky top-8 flex flex-col gap-8">
-            {/* Caixa de Metadados */}
-            <div class="bg-white border-4 border-ink p-6 shadow-hard">
-              <div class="flex flex-col gap-4">
-                {/* Data */}
-                <div class="border-b-2 border-ink pb-4">
-                  <span
-                    class="block font-mono text-xs uppercase opacity-60 mb-1"
-                    >Publicado em</span
-                  >
-                  <span class="font-headline text-2xl">
-                    {
-                      new Date(post.publishedAt).toLocaleDateString("pt-BR", {
-                        day: "2-digit",
-                        month: "long",
-                        year: "numeric",
-                      })
-                    }
-                  </span>
-                </div>
-
-                {/* Autor (Placeholder se não vier do Sanity) */}
-                <div class="border-b-2 border-ink pb-4">
-                  <span
-                    class="block font-mono text-xs uppercase opacity-60 mb-1"
-                    >Por</span
-                  >
-                  <span class="font-headline text-xl">MIXTAPE252 CREW</span>
-                </div>
-
-                {/* Tags (Placeholder) */}
-                <div>
-                  <span
-                    class="block font-mono text-xs uppercase opacity-60 mb-2"
-                    >Tags</span
-                  >
-                  <div class="flex flex-wrap gap-2">
-                    {/* 0. Channel Badge */}
-                    <div class="mb-2">
-                      <ChannelBadge channel={post.channel} />
-                    </div>
-
-                    {/* 1. Format Tag (Destaque) */}
-                    <span
-                      class="px-2 py-1 bg-safety-orange text-ink border-2 border-ink font-mono text-xs uppercase font-bold"
-                    >
-                      {post.format === "article" ? "ORIGINAL" : post.format}
-                    </span>
-
-                    {/* 2. Dynamic Tags from Sanity */}
-                    {
-                      post.tags &&
-                        post.tags.map((tag: string) => (
-                          <span class="px-2 py-1 bg-ink text-white font-mono text-xs uppercase">
-                            {tag}
-                          </span>
-                        ))
-                    }
-                  </div>
-                </div>
-              </div>
+      {/* Sidebar */}
+      <aside class="lg:col-span-4 relative">
+        <div class="sticky top-28 flex flex-col gap-8">
+          <div
+            class="backdrop-blur-sm border-4 p-6 shadow-hard bg-white/5"
+            style={`border-color: ${theme.border}`}
+          >
+            <div
+              class="border-b-2 pb-4 mb-4"
+              style={`border-color: ${theme.border}`}
+            >
+              <span class="block font-mono text-xs uppercase opacity-70"
+                >Publicado em</span
+              >
+              <span class="font-headline text-2xl">
+                {new Date(post.publishedAt).toLocaleDateString("pt-BR")}
+              </span>
             </div>
 
-            {/* Botão Voltar (Navegação Inteligente) */}
-            <a
-              id="back-link"
-              href={source ? `/drop/${source}` : "/"}
-              class="block w-full py-4 bg-ink text-white font-headline text-2xl uppercase hover:bg-safety-orange hover:text-ink transition-colors border-4 border-ink text-center shadow-hard transform hover:-rotate-1"
-            >
-              {source ? "← VOLTAR PARA A EDIÇÃO" : "← VOLTAR PARA O CAOS"}
-            </a>
+            <div class="flex flex-wrap gap-2">
+              {
+                post.tags?.map((tag: string) => (
+                  <span class="px-2 py-1 bg-black text-white font-mono text-xs uppercase border border-white/20">
+                    {tag}
+                  </span>
+                ))
+              }
+            </div>
           </div>
-        </aside>
-      </div>
-    </div>
 
-    {/* Divisor ASCII Final */}
-    <div class="py-8 px-4 text-center border-t-4 border-ink bg-ink text-paper">
-      <div class="font-mono text-sm md:text-base tracking-widest">
-        // FIM DA TRANSMISSÃO // FIM DA TRANSMISSÃO // FIM DA TRANSMISSÃO //
-      </div>
+          <a
+            href="/"
+            class="block w-full py-4 text-center font-headline text-2xl uppercase border-4 shadow-hard transition-all hover:-translate-y-1 hover:shadow-hard-lg group relative overflow-hidden"
+            style={{
+              color: theme.accent,
+              borderColor: theme.border,
+              backgroundColor: "rgba(0,0,0,0.1)",
+            }}
+          >
+            <div
+              class="absolute inset-0 bg-[var(--theme-accent)] translate-y-full group-hover:translate-y-0 transition-transform duration-200 z-0"
+            >
+            </div>
+            <span
+              class="relative z-10 group-hover:text-white transition-colors duration-200"
+            >
+              ← VOLTAR PARA O CAOS
+            </span>
+          </a>
+        </div>
+      </aside>
     </div>
   </article>
-
-  <script>
-    // Client-side fallback for static export (Smart Navigation)
-    const params = new URLSearchParams(window.location.search);
-    const source = params.get("source");
-    const backLink = document.getElementById("back-link");
-
-    if (source && backLink) {
-      backLink.setAttribute("href", `/drop/${source}`);
-      backLink.innerText = "← VOLTAR PARA A EDIÇÃO";
-    }
-  </script>
 </BaseLayout>
