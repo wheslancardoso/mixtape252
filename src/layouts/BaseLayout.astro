@@ -66,14 +66,13 @@ const ogImageUrl = image ? new URL(image, Astro.site || Astro.url).toString() : 
     
     <!-- CAMADA DE TEXTURA DE PAPEL SUJO/AMASSADO (Zine BG) -->
     <!-- Textura aplicada sobre todo o site para efeito Brutalista -->
-    <div 
-      class="fixed inset-0 z-50 pointer-events-none opacity-60 mix-blend-multiply bg-cover bg-center"
-      style="background-image: url('/zine-bg.jpg');"
-    ></div>
+    <!-- Configuração controlada via variáveis CSS em global.css -->
+    <div class="fx-paper-overlay" data-blend="multiply"></div>
     
     <!-- CAMADA DE RUÍDO (Noise/Grain) -->
     <!-- Efeito de chiado de TV/Grão de filme para textura adicional -->
-    <div class="noise-overlay opacity-[0.15]"></div>
+    <!-- Configuração controlada via variáveis CSS em global.css -->
+    <div class="fx-noise-overlay"></div>
 
     <Header />
 
