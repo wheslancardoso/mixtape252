@@ -20,7 +20,7 @@ const {
   type = "website",
   accentColor = "#ff4d00", // Padrão Laranja
   borderColor = "#111111", // Padrão Preto
-  pageBg = "#F0EAD6"       // Padrão Papel (Eggshell/Cream)
+  pageBg = "#F2E8D5"       // Padrão Papel (Kraft Claro)
 } = Astro.props;
 
 const ogImageUrl = image ? new URL(image, Astro.site || Astro.url).toString() : null;
@@ -70,6 +70,10 @@ const ogImageUrl = image ? new URL(image, Astro.site || Astro.url).toString() : 
       class="fixed inset-0 z-50 pointer-events-none opacity-60 mix-blend-multiply bg-cover bg-center"
       style="background-image: url('/zine-bg.jpg');"
     ></div>
+    
+    <!-- CAMADA DE RUÍDO (Noise/Grain) -->
+    <!-- Efeito de chiado de TV/Grão de filme para textura adicional -->
+    <div class="noise-overlay opacity-[0.15]"></div>
 
     <Header />
 
