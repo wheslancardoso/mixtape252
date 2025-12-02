@@ -20,7 +20,7 @@ const {
   type = "website",
   accentColor = "#ff4d00", // Padrão Laranja
   borderColor = "#111111", // Padrão Preto
-  pageBg = "#f4f1ea"       // Padrão Papel
+  pageBg = "#F0EAD6"       // Padrão Papel (Eggshell/Cream)
 } = Astro.props;
 
 const ogImageUrl = image ? new URL(image, Astro.site || Astro.url).toString() : null;
@@ -64,12 +64,12 @@ const ogImageUrl = image ? new URL(image, Astro.site || Astro.url).toString() : 
   
   <body class="text-ink font-body overflow-x-hidden relative min-h-screen flex flex-col transition-colors duration-300" style="background-color: var(--theme-bg);">
     
-    <!-- CAMADA DE TEXTURA REALISTA (Zine BG) -->
-    <!-- Opacidade 0.30 e Overlay: Garante textura visível mas texto legível -->
-    <div class="zine-texture fixed inset-0 z-[60] pointer-events-none opacity-30 mix-blend-overlay"></div>
-    
-    <!-- Camada extra de ruído digital (Opcional, para dar granulação) -->
-    <div class="fixed inset-0 z-[59] pointer-events-none opacity-5 mix-blend-multiply bg-[url('/overlay.png')] bg-cover bg-center"></div>
+    <!-- CAMADA DE TEXTURA DE PAPEL SUJO/AMASSADO (Zine BG) -->
+    <!-- Textura aplicada sobre todo o site para efeito Brutalista -->
+    <div 
+      class="fixed inset-0 z-50 pointer-events-none opacity-60 mix-blend-multiply bg-cover bg-center"
+      style="background-image: url('/zine-bg.jpg');"
+    ></div>
 
     <Header />
 
