@@ -19,3 +19,6 @@ const builder = imageUrlBuilder(sanityClient);
 export function urlFor(source: SanityImageSource) {
   return builder.image(source);
 }
+
+// Re-export sanityWriteClient from server module
+export { sanityWriteClient } from './sanity.server';

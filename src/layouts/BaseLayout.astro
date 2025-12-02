@@ -8,7 +8,6 @@ interface Props {
   description?: string;
   image?: string;
   type?: "website" | "article";
-  channel?: string;
   accentColor?: string;
   borderColor?: string;
   pageBg?: string;
@@ -19,20 +18,12 @@ const {
   description = "Digital Zine & Creative Collective",
   image,
   type = "website",
-  accentColor = "#ff4d00", // Padrão
-  borderColor = "#111111", // Padrão
-  pageBg = "#f4f1ea", // Padrão
+  accentColor = "#ff4d00", // Padrão Laranja
+  borderColor = "#111111", // Padrão Preto
+  pageBg = "#f4f1ea"       // Padrão Papel
 } = Astro.props;
 
-// URL OG
-const ogImageUrl = image
-  ? new URL(image, Astro.site || Astro.url).toString()
-  : null;
-const siteUrl =
-  Astro.site ||
-  (Astro.url
-    ? new URL(Astro.url.pathname, Astro.url.origin).toString()
-    : "https://mixtape252.com");
+const ogImageUrl = image ? new URL(image, Astro.site || Astro.url).toString() : null;
 ---
 
 <!doctype html>
@@ -43,26 +34,26 @@ const siteUrl =
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@400;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@400;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet" />
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
     <title>{title}</title>
 
-    {
-      /* Metas OG omitidas para brevidade, mas devem ser mantidas se existirem */
-    }
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content={type} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
+    {Astro.site && <meta property="og:url" content={Astro.site} />}
 
-    {/* INJEÇÃO DE CSS VARS PARA O TEMA */}
-    <style
-      define:vars={{
-        themeAccent: accentColor,
-        themeBorder: borderColor,
-        themeBg: pageBg,
-      }}
-    >
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    {ogImageUrl && <meta name="twitter:image" content={ogImageUrl} />}
+
+    <!-- VARIÁVEIS DINÂMICAS DE TEMA -->
+    <style define:vars={{ themeAccent: accentColor, themeBorder: borderColor, themeBg: pageBg }}>
       :root {
         --theme-accent: var(--themeAccent);
         --theme-border: var(--themeBorder);
@@ -70,27 +61,25 @@ const siteUrl =
       }
     </style>
   </head>
+  
+  <body class="text-ink font-body overflow-x-hidden relative min-h-screen flex flex-col transition-colors duration-300" style="background-color: var(--theme-bg);">
+    
+    <!-- CAMADA DE TEXTURA REALISTA (Zine BG) -->
+    <!-- Opacidade 0.30 e Overlay: Garante textura visível mas texto legível -->
+    <div class="zine-texture fixed inset-0 z-[60] pointer-events-none opacity-30 mix-blend-overlay"></div>
+    
+    <!-- Camada extra de ruído digital (Opcional, para dar granulação) -->
+    <div class="fixed inset-0 z-[59] pointer-events-none opacity-5 mix-blend-multiply bg-[url('/overlay.png')] bg-cover bg-center"></div>
 
-  <body
-    class="text-ink font-body overflow-x-hidden relative min-h-screen flex flex-col transition-colors duration-300"
-    style="background-color: var(--theme-bg);"
-  >
-    {/* TEXTURA DE RUÍDO (BRUTALISM) */}
-    <div
-      class="noise-overlay fixed inset-0 z-[60] pointer-events-none opacity-[0.05] mix-blend-overlay"
-    >
-    </div>
-
-    {/* HEADER SEM PROPS (Ele lê as variáveis do CSS) */}
     <Header />
 
     <main class="flex-grow pt-24 relative z-10">
-      <slot />
+        <slot />
     </main>
-
+    
     <Footer />
 
-    {/* --- MOBILE MENU OVERLAY (PRESERVADO E TEMATIZADO) --- */}
+    <!-- MENU MOBILE PRESERVADO -->
     <div
       id="mobile-menu-overlay"
       class="fixed inset-0 z-[70] bg-black text-white hidden flex-col items-center justify-center"
@@ -103,24 +92,16 @@ const siteUrl =
       </button>
 
       <ul class="flex flex-col gap-8 text-center">
-        {
-          ["Drops", "Feed", "Manifesto"].map((item) => (
+        {["Drops", "Feed", "Manifesto"].map((item) => (
             <li>
-              <a
-                href={
-                  item === "Feed"
-                    ? "/posts"
-                    : item === "Manifesto"
-                      ? "/sobre"
-                      : "/edicoes"
-                }
+            <a
+                href={item === "Feed" ? "/posts" : item === "Manifesto" ? "/sobre" : "/edicoes"}
                 class="font-headline font-bold text-6xl uppercase transition-colors hover:text-[var(--theme-accent)]"
-              >
+            >
                 {item}
-              </a>
+            </a>
             </li>
-          ))
-        }
+        ))}
         <li>
           <a
             href="/backstage"
@@ -133,7 +114,6 @@ const siteUrl =
     </div>
 
     <script>
-      // Script do Mobile Menu
       const trigger = document.getElementById("mobile-menu-trigger");
       const close = document.getElementById("mobile-menu-close");
       const overlay = document.getElementById("mobile-menu-overlay");

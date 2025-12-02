@@ -2,50 +2,60 @@
 import { PortableText } from "@portabletext/react";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import ChannelBadge from "../../components/ChannelBadge.astro";
-import { urlFor } from "../../lib/sanity";
-// Importamos o cliente autenticado para garantir que posts novos apareçam (sem cache)
-import { sanityWriteClient } from "../../lib/sanity.server";
+// IMPORT CORRIGIDO: Removemos o .server que estava quebrando o código
+import { sanityWriteClient, urlFor } from "../../lib/sanity";
 import Blockquote from "../../components/Blockquote";
-import {
-  H2,
-  H3,
-  BulletList,
-  NumberList,
-  SanityImage,
-} from "../../components/PortableTextComponents";
+import { H2, H3, BulletList, NumberList, SanityImage } from "../../components/PortableTextComponents";
 
 export async function getStaticPaths() {
-  // Query blindada: Traz posts publicados com slug definido
-  const posts = await sanityWriteClient.fetch(`
-    *[_type == "post" && defined(slug.current) && !(_id in path("drafts.**"))]{ 
-      slug,
-      channel 
-    }
-  `);
-
+  // Query corrigida para evitar erros 404
+  const posts = await sanityWriteClient.fetch(`*[_type == "post" && defined(slug.current) && !(_id in path("drafts.**"))]{ 
+    slug,
+    channel 
+  }`);
+  
   return posts.map((post: any) => ({
     params: { slug: post.slug.current },
-    props: {
-      postSlug: post.slug.current,
-      channel: post.channel,
-    },
   }));
 }
 
-const { postSlug } = Astro.props;
-
-// Buscamos o post completo aqui para garantir dados frescos na renderização
-const post = await sanityWriteClient.fetch(
-  `*[_type == "post" && slug.current == $slug][0]`,
-  { slug: postSlug },
-);
+const { slug } = Astro.params;
+const post = await sanityWriteClient.fetch(`*[_type == "post" && slug.current == $slug][0]`, { slug });
 
 if (!post) return Astro.redirect("/404");
 
-// Lógica de Canal (Default: Distorção)
-const channel = post.channel || "distorcao";
+// LOGICA DE CORES (Palette Swap)
+function getTheme(channel: string) {
+  switch (channel) {
+    case 'system_log': // Tech
+      return {
+        accent: '#34d399', 
+        border: '#065f46',
+        bg: '#0c0c0e', // Preto Carbono
+        text: '#34d399',
+        prose: 'prose-invert prose-emerald'
+      };
+    case 'pixel_trash': // Art
+      return {
+        accent: '#f472b6', 
+        border: '#831843',
+        bg: '#1a0b2e', // Roxo Profundo
+        text: '#f472b6',
+        prose: 'prose-invert prose-pink'
+      };
+    default: // Padrão (Distorção)
+      return {
+        accent: '#ff4d00', 
+        border: '#111111',
+        bg: '#f4f1ea', // Papel Off-White
+        text: '#111111',
+        prose: 'prose-neutral'
+      };
+  }
+}
 
-// Componentes do Portable Text
+const theme = getTheme(post.channel);
+
 const components = {
   block: { blockquote: Blockquote, h2: H2, h3: H3 },
   list: { bullet: BulletList, number: NumberList },
@@ -53,103 +63,88 @@ const components = {
 };
 ---
 
-<BaseLayout
-  title={post.title}
-  description={post.excerpt}
-  image={post.mainImage ? urlFor(post.mainImage).url() : undefined}
-  channel={channel}
+<BaseLayout 
+  title={post.title} 
+  description={post.excerpt} 
+  image={post.mainImage ? urlFor(post.mainImage).url() : null}
+  accentColor={theme.accent}
+  borderColor={theme.border}
+  pageBg={theme.bg}
 >
-  <article class="min-h-screen overflow-x-hidden">
-    {/* HERO SECTION */}
-    <header
-      class="relative w-full h-[70vh] border-b-4 border-[var(--theme-border)] overflow-hidden group"
+  <article 
+    class="min-h-screen overflow-x-hidden selection:text-white"
+    style={`color: ${theme.text}; selection:background-color: ${theme.accent};`}
+  >
+    <header 
+      class="relative w-full h-[65vh] border-b-4 overflow-hidden group"
+      style={`border-color: ${theme.border}`}
     >
-      {
-        post.mainImage ? (
-          <div class="absolute inset-0">
-            <img
-              src={urlFor(post.mainImage).width(1920).height(1080).url()}
-              alt={post.title}
-              class="w-full h-full object-cover grayscale contrast-125 brightness-75 transition-all duration-700 group-hover:grayscale-0"
-            />
-            {/* Overlay com a cor do tema via CSS mix-blend */}
-            <div class="absolute inset-0 bg-[var(--theme-bg)]/20 mix-blend-multiply" />
-          </div>
-        ) : (
-          <div class="absolute inset-0 bg-[var(--theme-border)] flex items-center justify-center">
-            <span class="font-headline text-[var(--theme-bg)] text-9xl opacity-10">
-              NO SIGNAL
-            </span>
-          </div>
-        )
-      }
+      {post.mainImage ? (
+        <div class="absolute inset-0">
+          <img 
+            src={urlFor(post.mainImage).width(1920).height(1080).url()} 
+            alt={post.title} 
+            class="w-full h-full object-cover grayscale contrast-125 brightness-75 transition-all duration-700 group-hover:grayscale-0"
+          />
+          <div class="absolute inset-0 bg-black/40 mix-blend-multiply"></div>
+        </div>
+      ) : (
+        <div class="absolute inset-0 bg-ink flex items-center justify-center">
+           <span class="font-headline text-paper text-9xl opacity-10">NO SIGNAL</span>
+        </div>
+      )}
 
       <div class="absolute bottom-0 left-0 w-full p-6 md:p-12 z-20">
         <div class="max-w-7xl mx-auto">
-          <div class="mb-4">
-            <ChannelBadge channel={channel} />
+          <div class="mb-4 transform -rotate-1">
+            <ChannelBadge channel={post.channel} />
           </div>
-          <h1
-            class="text-5xl md:text-8xl lg:text-9xl font-headline uppercase leading-[0.85] text-white drop-shadow-[6px_6px_0px_rgba(0,0,0,1)] tracking-tighter"
-          >
+          <h1 class="text-5xl md:text-8xl lg:text-9xl font-headline uppercase leading-[0.85] text-white drop-shadow-[6px_6px_0px_#000] tracking-tighter">
             {post.title}
           </h1>
         </div>
       </div>
     </header>
 
-    {/* CONTENT GRID */}
-    <div
-      class="max-w-7xl mx-auto px-4 py-12 md:py-20 grid grid-cols-1 lg:grid-cols-12 gap-12"
-    >
-      {/* Coluna Texto */}
+    <div class="max-w-7xl mx-auto px-4 py-12 md:py-20 grid grid-cols-1 lg:grid-cols-12 gap-12">
       <div class="lg:col-span-8">
-        <div
-          class="prose prose-xl max-w-none font-mono leading-relaxed text-[var(--theme-text)] prose-headings:font-headline prose-a:text-[var(--theme-accent)] prose-strong:text-[var(--theme-text)]"
-        >
+        <div class={`prose prose-xl max-w-none font-mono leading-relaxed ${theme.prose} prose-headings:font-headline hover:prose-a:text-[var(--theme-accent)]`}>
           <PortableText value={post.body} components={components} />
         </div>
       </div>
 
-      {/* Sidebar */}
       <aside class="lg:col-span-4 relative">
         <div class="sticky top-28 flex flex-col gap-8">
-          {/* Info Box */}
-          <div
-            class="backdrop-blur-sm border-4 border-[var(--theme-border)] p-6 shadow-hard bg-[var(--theme-bg)]/80"
+          <div 
+            class="backdrop-blur-sm border-4 p-6 shadow-hard bg-white/5"
+            style={`border-color: ${theme.border}`}
           >
-            <div class="border-b-2 border-[var(--theme-border)] pb-4 mb-4">
-              <span class="block font-mono text-xs uppercase opacity-70"
-                >Publicado em</span
-              >
-              <span class="font-headline text-2xl">
-                {new Date(post.publishedAt).toLocaleDateString("pt-BR")}
-              </span>
-            </div>
-
-            <div class="flex flex-wrap gap-2">
-              {
-                post.tags?.map((tag: string) => (
-                  <span class="px-2 py-1 bg-[var(--theme-border)] text-[var(--theme-bg)] font-mono text-xs uppercase">
+             <div class="border-b-2 pb-4 mb-4" style={`border-color: ${theme.border}`}>
+                <span class="block font-mono text-xs uppercase opacity-70">Publicado em</span>
+                <span class="font-headline text-2xl">
+                  {new Date(post.publishedAt).toLocaleDateString("pt-BR")}
+                </span>
+             </div>
+             
+             <div class="flex flex-wrap gap-2">
+                {post.tags?.map((tag: string) => (
+                  <span class="px-2 py-1 bg-black text-white font-mono text-xs uppercase border border-white/20">
                     {tag}
                   </span>
-                ))
-              }
-            </div>
+                ))}
+             </div>
           </div>
 
-          {/* Botão Voltar */}
-          <a
-            href="/"
-            class="block w-full py-4 text-center font-headline text-2xl uppercase border-4 border-[var(--theme-border)] shadow-hard transition-all hover:-translate-y-1 hover:shadow-hard-lg group relative overflow-hidden text-[var(--theme-accent)] bg-[var(--theme-bg)]"
+          <a href="/" 
+             class="block w-full py-4 text-center font-headline text-2xl uppercase border-4 shadow-hard transition-all hover:-translate-y-1 hover:shadow-hard-lg group relative overflow-hidden"
+             style={{ 
+               color: theme.accent, 
+               borderColor: theme.border,
+               backgroundColor: 'rgba(0,0,0,0.2)'
+             }}
           >
-            <div
-              class="absolute inset-0 bg-[var(--theme-accent)] translate-y-full group-hover:translate-y-0 transition-transform duration-200 z-0"
-            >
-            </div>
-            <span
-              class="relative z-10 group-hover:text-[var(--theme-bg)] transition-colors duration-200"
-            >
+            <div class="absolute inset-0 bg-[var(--theme-accent)] translate-y-full group-hover:translate-y-0 transition-transform duration-200 z-0"></div>
+            <span class="relative z-10 group-hover:text-white transition-colors duration-200 drop-shadow-md">
               ← VOLTAR PARA O CAOS
             </span>
           </a>
