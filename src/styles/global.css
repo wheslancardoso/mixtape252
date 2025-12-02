@@ -2,12 +2,13 @@
 
 @theme {
   --color-paper: #F2E8D5;
+  /* Papel Creme/Amarelado */
   --color-ink: #111111;
   --color-safety-orange: #ff4d00;
-  
+
   --font-headline: "Anton", "Oswald", sans-serif;
   --font-body: "Space Mono", monospace;
-  
+
   --shadow-hard: 6px 6px 0px 0px #111111;
   --shadow-hard-sm: 3px 3px 0px 0px #111111;
   --shadow-hard-lg: 10px 10px 0px 0px #111111;
@@ -15,71 +16,93 @@
 
 @layer base {
   :root {
-    /* ========================================= */
-    /* 🎛️ PAINEL DE CONTROLE DE EFEITOS (FX)    */
-    /* ========================================= */
+    /* --- 🎛️ PAINEL DE CONTROLE DE EFEITOS (FX) --- */
 
-    /* 1. TEXTURA DE PAPEL (Zine Background) */
-    /* Caminho da imagem na pasta /public */
-    --fx-paper-url: url("/zine-bg.jpg");
-    /* Intensidade (0.0 a 1.0). Defina 0 para DESATIVAR o papel */
-    --fx-paper-opacity: 0.6;
-    /* Modo de mistura: overlay, multiply, hard-light, screen */
-    --fx-paper-blend: multiply;
-
-    /* 2. RUÍDO DIGITAL (Noise/Grain) */
-    /* Pode ser uma imagem ou um SVG base64 */
-    --fx-noise-url: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-    /* Intensidade (0.0 a 1.0). Defina 0 para DESATIVAR o ruído */
+    /* 1. RUÍDO (Noise/Grain) */
+    /* Valor entre 0 (Desligado) e 1 (Muito Forte). Recomendado: 0.15 */
     --fx-noise-opacity: 0.15;
+
+    /* 2. PAPEL AMASSADO (Zine Texture) */
+    /* Valor entre 0 (Desligado) e 1 (Muito Forte). Recomendado: 0.4 */
+    --fx-paper-opacity: 0.4;
+
+    /* URL da imagem de papel (deve estar em /public) */
+    --fx-paper-url: url("/zine-bg.jpg");
+  }
+
+  body {
+    /* Define a cor base do site (variável injetada pelo Layout) */
+    background-color: var(--theme-bg, var(--color-paper));
+    color: var(--color-ink);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
   }
 }
 
-/* --- CLASSES DE APLICAÇÃO --- */
+/* --- CAMADAS DE EFEITO (FX LAYERS) --- */
 
-/* Camada do Papel */
-.fx-paper-overlay {
+/* Camada 1: Papel Amassado (Textura Física) */
+.fx-paper {
   position: fixed;
-  inset: 0;
-  z-index: 60; /* Elevado para cobrir todo o conteúdo (Header z-50, Main z-10), abaixo do menu mobile (z-70) */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
-  
-  /* Consome as variáveis */
+  /* Deixa clicar através */
+  z-index: 50;
+  /* Acima do conteúdo padrão */
+
   background-image: var(--fx-paper-url);
-  opacity: var(--fx-paper-opacity);
-  
-  /* Mix-blend-mode não aceita variáveis CSS diretamente, então usamos fallback */
-  mix-blend-mode: multiply; /* Fallback padrão */
-  
-  background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
-  /* Removido background-attachment: fixed para evitar bugs no mobile iOS */
+  background-repeat: no-repeat;
+
+  opacity: var(--fx-paper-opacity);
+  mix-blend-mode: overlay;
+  /* Faz a textura "manchar" a cor de fundo */
 }
 
-/* Aplicar blend mode baseado na variável (via atributo style inline ou classe específica) */
-.fx-paper-overlay[data-blend="overlay"] { mix-blend-mode: overlay; }
-.fx-paper-overlay[data-blend="multiply"] { mix-blend-mode: multiply; }
-.fx-paper-overlay[data-blend="hard-light"] { mix-blend-mode: hard-light; }
-.fx-paper-overlay[data-blend="screen"] { mix-blend-mode: screen; }
-
-/* Camada do Ruído */
-.fx-noise-overlay {
+/* Camada 2: Ruído Digital (TV Static) */
+.fx-noise {
   position: fixed;
-  inset: 0;
-  z-index: 65; /* Acima do papel (z-60) e Header (z-50), abaixo do menu mobile (z-70) */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
+  z-index: 51;
+  /* Acima do papel */
 
-  /* Consome as variáveis */
-  background-image: var(--fx-noise-url);
+  /* Padrão SVG de Ruído (Garantido funcionar) */
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+
   opacity: var(--fx-noise-opacity);
-  
-  mix-blend-mode: multiply;
-  background-repeat: repeat;
 }
 
-/* Utilitários de Animação */
-.marquee-container { overflow: hidden; white-space: nowrap; }
-.marquee-content { display: inline-block; animation: marquee 20s linear infinite; }
-@keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-.btn-press:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0px 0px #111111; }
+/* Utilitários */
+.marquee-container {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.marquee-content {
+  display: inline-block;
+  animation: marquee 20s linear infinite;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.btn-press:active {
+  transform: translate(4px, 4px);
+  box-shadow: 2px 2px 0px 0px #111111;
+}

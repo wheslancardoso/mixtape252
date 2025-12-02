@@ -20,10 +20,12 @@ const {
   type = "website",
   accentColor = "#ff4d00", // Padrão Laranja
   borderColor = "#111111", // Padrão Preto
-  pageBg = "#F2E8D5"       // Padrão Papel (Kraft Claro)
+  pageBg = "#F2E8D5", // Padrão Papel (Kraft Claro)
 } = Astro.props;
 
-const ogImageUrl = image ? new URL(image, Astro.site || Astro.url).toString() : null;
+const ogImageUrl = image
+  ? new URL(image, Astro.site || Astro.url).toString()
+  : null;
 ---
 
 <!doctype html>
@@ -34,7 +36,10 @@ const ogImageUrl = image ? new URL(image, Astro.site || Astro.url).toString() : 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@400;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@400;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0"
+      rel="stylesheet"
+    />
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
     <title>{title}</title>
@@ -53,7 +58,13 @@ const ogImageUrl = image ? new URL(image, Astro.site || Astro.url).toString() : 
     {ogImageUrl && <meta name="twitter:image" content={ogImageUrl} />}
 
     <!-- VARIÁVEIS DINÂMICAS DE TEMA -->
-    <style define:vars={{ themeAccent: accentColor, themeBorder: borderColor, themeBg: pageBg }}>
+    <style
+      define:vars={{
+        themeAccent: accentColor,
+        themeBorder: borderColor,
+        themeBg: pageBg,
+      }}
+    >
       :root {
         --theme-accent: var(--themeAccent);
         --theme-border: var(--themeBorder);
@@ -61,25 +72,23 @@ const ogImageUrl = image ? new URL(image, Astro.site || Astro.url).toString() : 
       }
     </style>
   </head>
-  
-  <body class="text-ink font-body overflow-x-hidden relative min-h-screen flex flex-col transition-colors duration-300" style="background-color: var(--theme-bg);">
-    
+
+  <body
+    class="text-ink font-body overflow-x-hidden relative min-h-screen flex flex-col transition-colors duration-300"
+    style="background-color: var(--theme-bg);"
+  >
     <!-- CAMADA DE TEXTURA DE PAPEL SUJO/AMASSADO (Zine BG) -->
-    <!-- Textura aplicada sobre todo o site para efeito Brutalista -->
-    <!-- Configuração controlada via variáveis CSS em global.css -->
-    <div class="fx-paper-overlay" data-blend="multiply"></div>
-    
+    <div class="fx-paper"></div>
+
     <!-- CAMADA DE RUÍDO (Noise/Grain) -->
-    <!-- Efeito de chiado de TV/Grão de filme para textura adicional -->
-    <!-- Configuração controlada via variáveis CSS em global.css -->
-    <div class="fx-noise-overlay"></div>
+    <div class="fx-noise"></div>
 
     <Header />
 
     <main class="flex-grow pt-24 relative z-10">
-        <slot />
+      <slot />
     </main>
-    
+
     <Footer />
 
     <!-- MENU MOBILE PRESERVADO -->
@@ -95,16 +104,24 @@ const ogImageUrl = image ? new URL(image, Astro.site || Astro.url).toString() : 
       </button>
 
       <ul class="flex flex-col gap-8 text-center">
-        {["Drops", "Feed", "Manifesto"].map((item) => (
+        {
+          ["Drops", "Feed", "Manifesto"].map((item) => (
             <li>
-            <a
-                href={item === "Feed" ? "/posts" : item === "Manifesto" ? "/sobre" : "/edicoes"}
+              <a
+                href={
+                  item === "Feed"
+                    ? "/posts"
+                    : item === "Manifesto"
+                      ? "/sobre"
+                      : "/edicoes"
+                }
                 class="font-headline font-bold text-6xl uppercase transition-colors hover:text-[var(--theme-accent)]"
-            >
+              >
                 {item}
-            </a>
+              </a>
             </li>
-        ))}
+          ))
+        }
         <li>
           <a
             href="/backstage"
