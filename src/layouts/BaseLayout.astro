@@ -18,9 +18,9 @@ const {
   description = "Digital Zine & Creative Collective",
   image,
   type = "website",
-  accentColor = "#ff4d00", // Padrão Laranja
-  borderColor = "#111111", // Padrão Preto
-  pageBg = "#F2E8D5", // Padrão Papel (Kraft Claro)
+  accentColor = "#ff4d00",
+  borderColor = "#111111",
+  pageBg = "#F2E8D5",
 } = Astro.props;
 
 const ogImageUrl = image
@@ -44,20 +44,6 @@ const ogImageUrl = image
     <meta name="description" content={description} />
     <title>{title}</title>
 
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content={type} />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
-    {Astro.site && <meta property="og:url" content={Astro.site} />}
-
-    <!-- Twitter -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content={description} />
-    {ogImageUrl && <meta name="twitter:image" content={ogImageUrl} />}
-
-    <!-- VARIÁVEIS DINÂMICAS DE TEMA -->
     <style
       define:vars={{
         themeAccent: accentColor,
@@ -77,11 +63,16 @@ const ogImageUrl = image
     class="text-ink font-body overflow-x-hidden relative min-h-screen flex flex-col transition-colors duration-300"
     style="background-color: var(--theme-bg);"
   >
-    <!-- CAMADA DE TEXTURA DE PAPEL SUJO/AMASSADO (Zine BG) -->
-    <div class="fx-paper"></div>
+    {/* 1. TEXTURA DE PAPEL (Comentada) */}
+    {
+      /* <div class="zine-texture fixed inset-0 z-[60] pointer-events-none opacity-70 mix-blend-multiply contrast-150 brightness-90"></div> */
+    }
 
-    <!-- CAMADA DE RUÍDO (Noise/Grain) -->
-    <div class="fx-noise"></div>
+    {/* 2. RUÍDO DIGITAL */}
+    <div class="noise-overlay"></div>
+
+    {/* 3. SUJEIRA / GRUNGE (Riscos) */}
+    <div class="grunge-overlay"></div>
 
     <Header />
 
@@ -91,7 +82,7 @@ const ogImageUrl = image
 
     <Footer />
 
-    <!-- MENU MOBILE PRESERVADO -->
+    {/* MENU MOBILE */}
     <div
       id="mobile-menu-overlay"
       class="fixed inset-0 z-[70] bg-black text-white hidden flex-col items-center justify-center"
